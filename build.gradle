@@ -1,0 +1,39 @@
+plugins {
+    id("groovy-gradle-plugin")
+}
+
+group = "net.auoeke"
+version = "0.0.0"
+
+sourceSets {
+    main {
+        groovy.srcDir("src")
+    }
+
+    test {
+        groovy.srcDir("test/src")
+        resources.srcDir("test/resources")
+    }
+}
+
+gradlePlugin {
+    plugins {
+        "fabric-mod-gradle" {
+            id = "fabric-mod-gradle"
+            implementationClass = "net.auoeke.fabricmodgradle.FabricModGradle"
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+
+    maven {url = "https://maven.fabricmc.net"}
+}
+
+dependencies {
+    api("net.fabricmc:fabric-loom:latest.integration")
+    api("com.google.code.gson:gson:latest.integration")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:latest.integration")
+}
