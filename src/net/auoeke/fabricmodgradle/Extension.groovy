@@ -36,13 +36,13 @@ class Extension implements JsonSerializable {
     public String description
 
     public Contact contact = new Contact()
-
     public PersonContainer authors
     public PersonContainer contributors
 
+    public LicenseContainer license = new LicenseContainer()
+
     public String environment
     public EntrypointContainer entrypoints
-
     public LanguageAdapterContainer languageAdapters = new LanguageAdapterContainer()
 
     public MixinContainer mixins = new MixinContainer()
@@ -179,6 +179,14 @@ class Extension implements JsonSerializable {
 
     void contributors(String... contributors) {
         contributors.each {this.contributor(it)}
+    }
+
+    void license(String license) {
+        this.license.licenses.add(license)
+    }
+
+    void licenses(String... licenses) {
+        this.license.licenses.addAll(licenses)
     }
 
     @Override

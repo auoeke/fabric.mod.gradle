@@ -47,6 +47,8 @@ mod {
             sources = "https://git.auoeke.net"
         }
 
+        licenses("GNU LGPL 3.0", "Apache 2.0")
+
         entrypoints {
             main("net.auoeke.testmod.MainEntrypoint")
             // or add("main", "net.auoeke.testmod.MainEntrypoint")
