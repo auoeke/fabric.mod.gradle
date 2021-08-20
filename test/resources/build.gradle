@@ -19,8 +19,7 @@ mod {
 
         entrypoints {
             main("net.auoeke.testmod.MainEntrypoint")
-            // or
-            add("main", "net.auoeke.testmod.MainEntrypoint")
+            // or add("main", "net.auoeke.testmod.MainEntrypoint")
 
             client {
                 value = "net.auoeke.testmod.GroovyEntrypoint"
@@ -31,8 +30,6 @@ mod {
         }
 
         entrypoints.server("net.auoeke.testmod.ClientEntrypoint")
-
-        jars("jars/test0.jar", "jars/test1.jar")
 
         languageAdapters {
             kotlin = "net.fabricmc.language.kotlin.KotlinAdapter"
@@ -49,5 +46,24 @@ mod {
         // or
         mixin("client", "client.mixins.json")
         mixin("server", "server.mixins.json")
+
+        depends {
+            minecraft = ["1.16.5", "1.17", "1.17.1"]
+            fabricloader = "*"
+        }
+
+        recommends {
+            limitless = "1.5.0"
+        }
+
+        suggests {
+            sodium = "*"
+        }
+
+        conflicts {
+            "hyphenated-mod-id" "0.1.2", "1.2.3"
+        }
+
+        jars("jars/test0.jar", "jars/test1.jar")
     }
 }

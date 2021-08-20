@@ -3,10 +3,11 @@ package net.auoeke.fabricmodgradle.mixin
 import com.google.gson.JsonElement
 import com.google.gson.JsonSerializationContext
 import groovy.transform.CompileStatic
+import net.auoeke.fabricmodgradle.json.Container
 import net.auoeke.fabricmodgradle.json.JsonSerializable
 
 @CompileStatic
-class MixinContainer implements JsonSerializable {
+class MixinContainer implements JsonSerializable, Container {
     public final List<MixinEntry> entries = []
 
     void add(String environment, String configuration) {
@@ -24,5 +25,10 @@ class MixinContainer implements JsonSerializable {
     @Override
     JsonElement toJson(JsonSerializationContext context) {
         return context.serialize(this.entries)
+    }
+
+    @Override
+    boolean isEmpty() {
+        return this.entries.empty
     }
 }

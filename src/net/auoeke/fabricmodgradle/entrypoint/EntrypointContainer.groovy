@@ -3,6 +3,7 @@ package net.auoeke.fabricmodgradle.entrypoint
 import com.google.gson.JsonElement
 import com.google.gson.JsonSerializationContext
 import groovy.transform.CompileStatic
+import net.auoeke.fabricmodgradle.json.Container
 import net.auoeke.fabricmodgradle.json.JsonSerializable
 import org.gradle.api.Project
 
@@ -10,7 +11,7 @@ import java.lang.reflect.Method
 import java.util.stream.Stream
 
 @CompileStatic
-class EntrypointContainer implements JsonSerializable {
+class EntrypointContainer implements JsonSerializable, Container {
     private static final List<Method> methods = (List<Method>) Stream.of(EntrypointContainer.class.declaredMethods).filter(method -> method.name == "add").toList()
 
     private final Project project
@@ -55,5 +56,10 @@ class EntrypointContainer implements JsonSerializable {
     @Override
     JsonElement toJson(JsonSerializationContext context) {
         return context.serialize(this.entrypoints)
+    }
+
+    @Override
+    boolean isEmpty() {
+        return this.entrypoints.isEmpty()
     }
 }

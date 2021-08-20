@@ -13,7 +13,11 @@ import java.nio.file.Files
 
 @CompileStatic
 class FabricModGradle implements Plugin<Project> {
-    public static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().registerTypeHierarchyAdapter(JsonSerializable, new JsonSerializableAdapter()).create()
+    public static final Gson gson = new GsonBuilder()
+        .setPrettyPrinting()
+        .disableHtmlEscaping()
+        .registerTypeHierarchyAdapter(JsonSerializable, new JsonSerializableAdapter())
+        .create()
 
     @Override
     void apply(Project project) {
