@@ -19,6 +19,9 @@ class Extension {
     public String id
     public String version
 
+    public String modName
+    public String description
+
     // optional
     public String environment
     public EntrypointContainer entrypoints
@@ -43,6 +46,10 @@ class Extension {
 
     void setVersion(Object version) {
         this.version = version as String
+    }
+
+    void setName(String name) {
+        this.modName = name
     }
 
     void setEnvironment(String environment) {
