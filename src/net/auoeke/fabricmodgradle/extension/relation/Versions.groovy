@@ -1,10 +1,10 @@
-package net.auoeke.fabricmodgradle.relation
+package net.auoeke.fabricmodgradle.extension.relation
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import groovy.transform.CompileStatic
-import net.auoeke.fabricmodgradle.json.JsonSerializable
+import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
 
 @CompileStatic
 class Versions implements JsonSerializable {
@@ -12,6 +12,6 @@ class Versions implements JsonSerializable {
 
     @Override
     JsonElement toJson(JsonSerializationContext context) {
-        return this.versions.size() == 1 ? new JsonPrimitive(this.versions[0]) : context.serialize(this.versions)
+        return this.versions.size() === 1 ? new JsonPrimitive(this.versions[0]) : context.serialize(this.versions)
     }
 }

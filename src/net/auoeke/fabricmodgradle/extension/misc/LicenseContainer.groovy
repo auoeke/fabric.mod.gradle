@@ -1,11 +1,11 @@
-package net.auoeke.fabricmodgradle
+package net.auoeke.fabricmodgradle.extension.misc
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import groovy.transform.CompileStatic
-import net.auoeke.fabricmodgradle.json.Container
-import net.auoeke.fabricmodgradle.json.JsonSerializable
+import net.auoeke.fabricmodgradle.extension.json.Container
+import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
 
 @CompileStatic
 class LicenseContainer implements JsonSerializable, Container {
@@ -13,7 +13,7 @@ class LicenseContainer implements JsonSerializable, Container {
 
     @Override
     JsonElement toJson(JsonSerializationContext context) {
-        return this.licenses.size() == 1 ? new JsonPrimitive(this.licenses[0]) : context.serialize(this.licenses)
+        return this.licenses.size() === 1 ? new JsonPrimitive(this.licenses[0]) : context.serialize(this.licenses)
     }
 
     @Override

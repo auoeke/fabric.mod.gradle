@@ -1,7 +1,7 @@
-package net.auoeke.fabricmodgradle.contact
+package net.auoeke.fabricmodgradle.extension.contact
 
 import groovy.transform.CompileStatic
-import net.auoeke.fabricmodgradle.json.Container
+import net.auoeke.fabricmodgradle.extension.json.Container
 
 import java.util.function.Predicate
 

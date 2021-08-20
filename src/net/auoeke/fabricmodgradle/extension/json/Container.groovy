@@ -1,4 +1,4 @@
-package net.auoeke.fabricmodgradle.json
+package net.auoeke.fabricmodgradle.extension.json
 
 import groovy.transform.CompileStatic;
 

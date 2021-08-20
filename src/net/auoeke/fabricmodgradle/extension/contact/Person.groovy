@@ -1,11 +1,11 @@
-package net.auoeke.fabricmodgradle.contact
+package net.auoeke.fabricmodgradle.extension.contact
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import groovy.transform.CompileStatic
-import net.auoeke.fabricmodgradle.json.JsonSerializable
+import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
 
 @CompileStatic
 class Person implements JsonSerializable {
@@ -19,7 +19,7 @@ class Person implements JsonSerializable {
 
     @Override
     JsonElement toJson(JsonSerializationContext context) {
-        if (this.contact == null || this.contact.empty) {
+        if (this.contact === null || this.contact.empty) {
             return new JsonPrimitive(this.name)
         }
 

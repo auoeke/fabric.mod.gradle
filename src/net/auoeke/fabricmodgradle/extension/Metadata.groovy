@@ -1,20 +1,23 @@
-package net.auoeke.fabricmodgradle
+package net.auoeke.fabricmodgradle.extension
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import groovy.transform.CompileStatic
-import net.auoeke.fabricmodgradle.contact.Person
-import net.auoeke.fabricmodgradle.contact.PersonContainer
-import net.auoeke.fabricmodgradle.contact.Contact
-import net.auoeke.fabricmodgradle.entrypoint.EntrypointContainer
-import net.auoeke.fabricmodgradle.json.Container
-import net.auoeke.fabricmodgradle.json.JsonSerializable
-import net.auoeke.fabricmodgradle.mixin.MixinContainer
-import net.auoeke.fabricmodgradle.relation.RelationContainer
+import net.auoeke.fabricmodgradle.FabricModGradle
+import net.auoeke.fabricmodgradle.extension.contact.Contact
+import net.auoeke.fabricmodgradle.extension.contact.Person
+import net.auoeke.fabricmodgradle.extension.contact.PersonContainer
+import net.auoeke.fabricmodgradle.extension.entrypoint.EntrypointContainer
+import net.auoeke.fabricmodgradle.extension.json.Container
+import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
+import net.auoeke.fabricmodgradle.extension.misc.IconContainer
+import net.auoeke.fabricmodgradle.extension.misc.JarContainer
+import net.auoeke.fabricmodgradle.extension.misc.LanguageAdapterContainer
+import net.auoeke.fabricmodgradle.extension.misc.LicenseContainer
+import net.auoeke.fabricmodgradle.extension.mixin.MixinContainer
+import net.auoeke.fabricmodgradle.extension.relation.RelationContainer
 import org.gradle.api.Project
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.api.tasks.SourceSet
 
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -22,17 +25,15 @@ import java.util.stream.Stream
 
 @SuppressWarnings("unused")
 @CompileStatic
-class Extension implements JsonSerializable {
+class Metadata implements JsonSerializable {
     private static final List<String> environmentValues = [null, "client", "server", "*"]
-    private static final List<Field> serializableFields = Stream.of(Extension.declaredFields).filter(field -> !(field.modifiers & (Modifier.STATIC | Modifier.TRANSIENT))).toList()
-
-    public transient final String name
+    private static final List<Field> serializableFields = Stream.of(Metadata.declaredFields).filter(field -> !(field.modifiers & (Modifier.STATIC | Modifier.TRANSIENT))).toList()
 
     public int schemaVersion = 1
     public String id
     public String version
 
-    public String modName
+    public String name
     public String description
 
     public Contact contact = new Contact()
@@ -40,6 +41,8 @@ class Extension implements JsonSerializable {
     public PersonContainer contributors
 
     public LicenseContainer license = new LicenseContainer()
+
+    public IconContainer icon = new IconContainer()
 
     public String environment
     public EntrypointContainer entrypoints
@@ -57,28 +60,21 @@ class Extension implements JsonSerializable {
 
     private transient final Project project
 
-    Extension(Project project, String name) {
+    Metadata(Project project) {
         this.project = project
-        this.authors = new PersonContainer(project)
-        this.contributors = new PersonContainer(project)
-        this.entrypoints = new EntrypointContainer(project)
-        this.name = name
 
         this.id = project.getName()
         this.setVersion(project.getVersion())
-        this.description = project.description
-    }
 
-    SourceSet getSet() {
-        return this.project.extensions.getByType(JavaPluginExtension).sourceSets.getByName(this.name)
+        this.description = project.description
+
+        this.authors = new PersonContainer(project)
+        this.contributors = new PersonContainer(project)
+        this.entrypoints = new EntrypointContainer(project)
     }
 
     void setVersion(Object version) {
         this.version = version as String
-    }
-
-    void setName(String name) {
-        this.modName = name
     }
 
     void setEnvironment(String environment) {
@@ -125,24 +121,24 @@ class Extension implements JsonSerializable {
         this.mixins.add(environment, configuration)
     }
 
-    void depends(Closure configuration) {
-        this.configure(this.depends, configuration)
+    void depends(Map<String, Object> dependencies) {
+        this.depends.add(dependencies)
     }
 
-    void recommends(Closure configuration) {
-        this.configure(this.recommends, configuration)
+    void recommends(Map<String, Object> dependencies) {
+        this.recommends.add(dependencies)
     }
 
-    void suggests(Closure configuration) {
-        this.configure(this.suggests, configuration)
+    void suggests(Map<String, Object> dependencies) {
+        this.suggests.add(dependencies)
     }
 
-    void breaks(Closure configuration) {
-        this.configure(this.breaks, configuration)
+    void breaks(Map<String, Object> dependencies) {
+        this.breaks.add(dependencies)
     }
 
-    void conflicts(Closure configuration) {
-        this.configure(this.conflicts, configuration)
+    void conflicts(Map<String, Object> dependencies) {
+        this.conflicts.add(dependencies)
     }
 
     void contact(Closure configuration) {
@@ -189,6 +185,28 @@ class Extension implements JsonSerializable {
         this.license.licenses.addAll(licenses)
     }
 
+    void icon(Map<Integer, String> icons) {
+        icons.each {entry ->
+            if (icons.containsValue(null)) {
+                throw new IllegalArgumentException("null values are not allowed.")
+            }
+
+            if (icons.size() > 1 && icons.containsKey(null)) {
+                throw new IllegalArgumentException("An icon for all sizes was already specified.")
+            }
+        }
+
+        this.icon.icons = icons
+    }
+
+    void icon(String path) {
+        if (this.icon.icons.size() !== 0) {
+            throw new IllegalStateException("An icon for a specific size was already specified.")
+        }
+
+        this.icon.icons[null] = path
+    }
+
     @Override
     JsonElement toJson(JsonSerializationContext context) {
         var json = new JsonObject()
@@ -197,7 +215,7 @@ class Extension implements JsonSerializable {
             field.trySetAccessible()
             var value = field.get(this)
 
-            if (value != null && !(value instanceof Container && (value as Container).empty || value instanceof Collection && (value as Collection).empty)) {
+            if (value !== null && !(value instanceof Container && (value as Container).empty || value instanceof Collection && (value as Collection).empty)) {
                 json.add(field.name, context.serialize(value))
             }
         }
@@ -205,7 +223,7 @@ class Extension implements JsonSerializable {
         return json
     }
 
-    private void configure(Object object, Closure configuration) {
-        this.project.configure(object, configuration)
+    private Object configure(Object object, Closure configuration) {
+        return FabricModGradle.configure(this.project, object, configuration)
     }
 }

@@ -1,10 +1,10 @@
-package net.auoeke.fabricmodgradle.contact
+package net.auoeke.fabricmodgradle.extension.contact
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonSerializationContext
 import groovy.transform.CompileStatic
-import net.auoeke.fabricmodgradle.json.Container
-import net.auoeke.fabricmodgradle.json.JsonSerializable
+import net.auoeke.fabricmodgradle.extension.json.Container
+import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
 import org.gradle.api.Project
 
 @CompileStatic
@@ -18,7 +18,7 @@ class PersonContainer implements JsonSerializable, Container {
     }
 
     Person add(String name, Closure configuration = null) {
-        var person = new Person(name, configuration == null ? null as Contact : new Contact())
+        var person = new Person(name, configuration === null ? null as Contact : new Contact())
         this.project.configure(person.contact, configuration)
         this.people.add(person)
 

@@ -1,10 +1,10 @@
-package net.auoeke.fabricmodgradle.mixin
+package net.auoeke.fabricmodgradle.extension.mixin
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonSerializationContext
 import groovy.transform.CompileStatic
-import net.auoeke.fabricmodgradle.json.Container
-import net.auoeke.fabricmodgradle.json.JsonSerializable
+import net.auoeke.fabricmodgradle.extension.json.Container
+import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
 
 @CompileStatic
 class MixinContainer implements JsonSerializable, Container {
