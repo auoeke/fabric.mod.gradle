@@ -4,6 +4,9 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import groovy.transform.CompileStatic
+import net.auoeke.fabricmodgradle.contact.Author
+import net.auoeke.fabricmodgradle.contact.AuthorContainer
+import net.auoeke.fabricmodgradle.contact.Contact
 import net.auoeke.fabricmodgradle.entrypoint.EntrypointContainer
 import net.auoeke.fabricmodgradle.json.Container
 import net.auoeke.fabricmodgradle.json.JsonSerializable
@@ -25,7 +28,6 @@ class Extension implements JsonSerializable {
 
     public transient final String name
 
-    // mandatory
     public int schemaVersion = 1
     public String id
     public String version
@@ -33,17 +35,22 @@ class Extension implements JsonSerializable {
     public String modName
     public String description
 
-    // optional
+    public Contact contact = new Contact()
+
+    public AuthorContainer authors
+
     public String environment
     public EntrypointContainer entrypoints
+
     public LanguageAdapterContainer languageAdapters = new LanguageAdapterContainer()
+
     public MixinContainer mixins = new MixinContainer()
 
-    public RelationContainer depends = new RelationContainer()
-    public RelationContainer recommends = new RelationContainer()
-    public RelationContainer suggests = new RelationContainer()
-    public RelationContainer breaks = new RelationContainer()
-    public RelationContainer conflicts = new RelationContainer()
+    public RelationContainer depends = new RelationContainer(),
+                             recommends = new RelationContainer(),
+                             suggests = new RelationContainer(),
+                             breaks = new RelationContainer(),
+                             conflicts = new RelationContainer()
 
     public JarContainer jars = new JarContainer()
 
@@ -51,6 +58,7 @@ class Extension implements JsonSerializable {
 
     Extension(Project project, String name) {
         this.project = project
+        this.authors = new AuthorContainer(project)
         this.entrypoints = new EntrypointContainer(project)
         this.name = name
 
@@ -79,7 +87,7 @@ class Extension implements JsonSerializable {
     }
 
     void entrypoints(Closure configuration) {
-        this.project.configure(this.entrypoints, configuration)
+        this.configure(this.entrypoints, configuration)
     }
 
     void jars(String... paths) {
@@ -91,7 +99,7 @@ class Extension implements JsonSerializable {
     }
 
     void languageAdapters(Closure configuration) {
-        this.project.configure(this.languageAdapters, configuration)
+        this.configure(this.languageAdapters, configuration)
     }
 
     void languageAdapter(String key, String type) {
@@ -99,7 +107,7 @@ class Extension implements JsonSerializable {
     }
 
     void mixins(Closure configuration) {
-        this.project.configure(this.mixins, configuration)
+        this.configure(this.mixins, configuration)
     }
 
     void mixins(String... configurations) {
@@ -115,23 +123,39 @@ class Extension implements JsonSerializable {
     }
 
     void depends(Closure configuration) {
-        this.relations(this.depends, configuration)
+        this.configure(this.depends, configuration)
     }
 
     void recommends(Closure configuration) {
-        this.relations(this.recommends, configuration)
+        this.configure(this.recommends, configuration)
     }
 
     void suggests(Closure configuration) {
-        this.relations(this.suggests, configuration)
+        this.configure(this.suggests, configuration)
     }
 
     void breaks(Closure configuration) {
-        this.relations(this.breaks, configuration)
+        this.configure(this.breaks, configuration)
     }
 
     void conflicts(Closure configuration) {
-        this.relations(this.conflicts, configuration)
+        this.configure(this.conflicts, configuration)
+    }
+
+    void contact(Closure configuration) {
+        this.configure(this.contact, configuration)
+    }
+
+    void authors(Closure configuration) {
+        this.configure(this.authors, configuration)
+    }
+
+    void authors(String... authors) {
+        authors.each {this.author(it)}
+    }
+
+    void author(String author) {
+        this.authors.authors.add(new Author(author))
     }
 
     @Override
@@ -139,9 +163,10 @@ class Extension implements JsonSerializable {
         var json = new JsonObject()
 
         serializableFields.each {field ->
+            field.trySetAccessible()
             var value = field.get(this)
 
-            if (value != null && !(value instanceof Container && (value as Container).empty)) {
+            if (value != null && !(value instanceof Container && (value as Container).empty || value instanceof Collection && (value as Collection).empty)) {
                 json.add(field.name, context.serialize(value))
             }
         }
@@ -149,7 +174,7 @@ class Extension implements JsonSerializable {
         return json
     }
 
-    private void relations(RelationContainer container, Closure configuration) {
-        this.project.configure(container, configuration)
+    private void configure(Object object, Closure configuration) {
+        this.project.configure(object, configuration)
     }
 }

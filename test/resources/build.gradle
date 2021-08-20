@@ -17,6 +17,25 @@ mod {
         name = "test mod"
         description = "fabric-mod-gradle's test mod"
 
+        contact {
+            email = "blockdestroyer68@example.net"
+            irc = "irc://irc.example.net:6667/fabric-mod-gradle"
+            homepage = "https://example.net"
+            issues = "https://git.auoeke.net/fabric-mod-gradle"
+            sources = "https://git.auoeke.net/fabric-mod-gradle/issues"
+        }
+
+        authors {
+            auoeke {
+                email = "me@auoeke.net"
+                irc = "todo"
+                homepage = "https://auoeke.net"
+                issues = "https://git.auoeke.net"
+                sources = "https://git.auoeke.net"
+            }
+            blockdestroyer68
+        }
+
         entrypoints {
             main("net.auoeke.testmod.MainEntrypoint")
             // or add("main", "net.auoeke.testmod.MainEntrypoint")
