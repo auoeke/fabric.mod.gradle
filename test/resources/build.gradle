@@ -14,13 +14,14 @@ mod {
     main {
         entrypoints {
             main("net.auoeke.testmod.MainEntrypoint")
+            // or
             add("main", "net.auoeke.testmod.MainEntrypoint")
 
             client {
                 value = "net.auoeke.testmod.GroovyEntrypoint"
                 adapter = "groovy"
             }
-
+            // or
             client("groovy", "net.auoeke.testmod.GroovyEntrypoint")
         }
 
@@ -33,5 +34,15 @@ mod {
         }
 
         languageAdapter("groovy", "net.fabricmc.language.groovy.GroovyLanguageAdapter")
+
+        mixin("testmod.mixins.json")
+
+        mixins {
+            client("client.mixins.json")
+            server("server.mixins.json")
+        }
+        // or
+        mixin("client", "client.mixins.json")
+        mixin("server", "server.mixins.json")
     }
 }

@@ -2,6 +2,7 @@ package net.auoeke.fabricmodgradle
 
 import groovy.transform.CompileStatic
 import net.auoeke.fabricmodgradle.entrypoint.EntrypointContainer
+import net.auoeke.fabricmodgradle.mixin.MixinContainer
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.SourceSet
@@ -22,6 +23,7 @@ class Extension {
     public String environment
     public EntrypointContainer entrypoints
     public LanguageAdapterContainer languageAdapters = new LanguageAdapterContainer()
+    public MixinContainer mixins = new MixinContainer()
     public JarContainer jars = new JarContainer()
 
     private transient final Project project
@@ -69,5 +71,21 @@ class Extension {
 
     void languageAdapter(String key, String type) {
         this.languageAdapters[key] = type
+    }
+
+    void mixins(Closure configuration) {
+        this.project.configure(this.mixins, configuration)
+    }
+
+    void mixins(String... configurations) {
+        configurations.each {this.mixin(it)}
+    }
+
+    void mixin(String configuration) {
+        this.mixin(null, configuration)
+    }
+
+    void mixin(String environment, String configuration) {
+        this.mixins.add(environment, configuration)
     }
 }
