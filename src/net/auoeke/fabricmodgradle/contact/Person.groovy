@@ -8,27 +8,24 @@ import groovy.transform.CompileStatic
 import net.auoeke.fabricmodgradle.json.JsonSerializable
 
 @CompileStatic
-class Author implements JsonSerializable {
+class Person implements JsonSerializable {
     public final String name
     public final Contact contact
 
-    Author(String name, Contact contact = null) {
+    Person(String name, Contact contact = null) {
         this.name = name
         this.contact = contact
     }
 
     @Override
     JsonElement toJson(JsonSerializationContext context) {
-        if (this.contact == null) {
+        if (this.contact == null || this.contact.empty) {
             return new JsonPrimitive(this.name)
         }
 
         var json = new JsonObject()
         json.add("name", new JsonPrimitive(this.name))
-
-        context.serialize(this.contact).asJsonObject.entrySet().each {
-            json.add(it.key, it.value)
-        }
+        json.add("contact", context.serialize(this.contact))
 
         return json
     }

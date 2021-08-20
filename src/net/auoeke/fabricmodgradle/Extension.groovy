@@ -4,8 +4,8 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import groovy.transform.CompileStatic
-import net.auoeke.fabricmodgradle.contact.Author
-import net.auoeke.fabricmodgradle.contact.AuthorContainer
+import net.auoeke.fabricmodgradle.contact.Person
+import net.auoeke.fabricmodgradle.contact.PersonContainer
 import net.auoeke.fabricmodgradle.contact.Contact
 import net.auoeke.fabricmodgradle.entrypoint.EntrypointContainer
 import net.auoeke.fabricmodgradle.json.Container
@@ -37,7 +37,8 @@ class Extension implements JsonSerializable {
 
     public Contact contact = new Contact()
 
-    public AuthorContainer authors
+    public PersonContainer authors
+    public PersonContainer contributors
 
     public String environment
     public EntrypointContainer entrypoints
@@ -58,12 +59,14 @@ class Extension implements JsonSerializable {
 
     Extension(Project project, String name) {
         this.project = project
-        this.authors = new AuthorContainer(project)
+        this.authors = new PersonContainer(project)
+        this.contributors = new PersonContainer(project)
         this.entrypoints = new EntrypointContainer(project)
         this.name = name
 
         this.id = project.getName()
         this.setVersion(project.getVersion())
+        this.description = project.description
     }
 
     SourceSet getSet() {
@@ -110,12 +113,12 @@ class Extension implements JsonSerializable {
         this.configure(this.mixins, configuration)
     }
 
-    void mixins(String... configurations) {
-        configurations.each {this.mixin(it)}
-    }
-
     void mixin(String configuration) {
         this.mixin(null, configuration)
+    }
+
+    void mixins(String... configurations) {
+        configurations.each {this.mixin(it)}
     }
 
     void mixin(String environment, String configuration) {
@@ -150,12 +153,32 @@ class Extension implements JsonSerializable {
         this.configure(this.authors, configuration)
     }
 
+    void author(String author, Closure configuration) {
+        this.authors.add(author, configuration)
+    }
+
+    void author(String author) {
+        this.authors.people.add(new Person(author))
+    }
+
     void authors(String... authors) {
         authors.each {this.author(it)}
     }
 
-    void author(String author) {
-        this.authors.authors.add(new Author(author))
+    void contributors(Closure configuration) {
+        this.configure(this.contributors, configuration)
+    }
+
+    void contributor(String author, Closure configuration) {
+        this.contributors.add(author, configuration)
+    }
+
+    void contributor(String contributor) {
+        this.contributors.people.add(new Person(contributor))
+    }
+
+    void contributors(String... contributors) {
+        contributors.each {this.contributor(it)}
     }
 
     @Override

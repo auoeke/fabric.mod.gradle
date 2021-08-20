@@ -8,21 +8,21 @@ import net.auoeke.fabricmodgradle.json.JsonSerializable
 import org.gradle.api.Project
 
 @CompileStatic
-class AuthorContainer implements JsonSerializable, Container {
-    public final Set<Author> authors = []
+class PersonContainer implements JsonSerializable, Container {
+    public final Set<Person> people = []
 
     private final Project project
 
-    AuthorContainer(Project project) {
+    PersonContainer(Project project) {
         this.project = project
     }
 
-    Author add(String name, Closure configuration = null) {
-        var author = new Author(name, configuration == null ? null as Contact : new Contact())
-        this.project.configure(author.contact, configuration)
-        this.authors.add(author)
+    Person add(String name, Closure configuration = null) {
+        var person = new Person(name, configuration == null ? null as Contact : new Contact())
+        this.project.configure(person.contact, configuration)
+        this.people.add(person)
 
-        return author
+        return person
     }
 
     @Override
@@ -31,17 +31,12 @@ class AuthorContainer implements JsonSerializable, Container {
     }
 
     @Override
-    Object getProperty(String propertyName) {
-        return this.add(propertyName)
-    }
-
-    @Override
     JsonElement toJson(JsonSerializationContext context) {
-        return context.serialize(this.authors)
+        return context.serialize(this.people)
     }
 
     @Override
     boolean isEmpty() {
-        return this.authors.empty
+        return this.people.empty
     }
 }
