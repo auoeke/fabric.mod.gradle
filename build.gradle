@@ -1,5 +1,6 @@
 plugins {
     id("java-gradle-plugin")
+    id("maven-publish")
     id("org.jetbrains.kotlin.jvm").version("latest.integration")
 }
 
@@ -47,4 +48,17 @@ test {
     dependsOn(pluginUnderTestMetadata)
 
     useJUnitPlatform()
+}
+
+publishing {
+    repositories {
+        maven {
+            url = "https://auoeke.jfrog.io/artifactory/maven"
+
+            credentials {
+                username = System.properties["maven.username"]
+                password = System.properties["maven.password"]
+            }
+        }
+    }
 }
