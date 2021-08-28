@@ -2,15 +2,13 @@ package net.auoeke.fabricmodgradle.extension.json
 
 import com.google.gson.JsonElement
 import com.google.gson.JsonSerializationContext
-import groovy.transform.CompileStatic
 
-@CompileStatic
 interface JsonSerializable {
-    default JsonElement toJson(JsonSerializationContext context) {
+    fun toJson(context: JsonSerializationContext): JsonElement {
         return this.toJson()
     }
 
-    default JsonElement toJson() {
-        return null
+    fun toJson(): JsonElement {
+        TODO("implement this")
     }
 }
