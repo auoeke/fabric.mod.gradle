@@ -1,6 +1,8 @@
 package net.auoeke.fabricmodgradle.extension.entrypoint
 
+import com.google.gson.JsonArray
 import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import groovy.lang.Closure
 import groovy.lang.GroovyObjectSupport
@@ -37,7 +39,7 @@ class EntrypointContainer(private val metadata: Metadata) : GroovyObjectSupport(
             it[0] = name
         }
 
-        for (method in methods) {
+        methods.forEach {method ->
             catch<IllegalArgumentException> {
                 return method(this, *argList)
             }
@@ -46,8 +48,14 @@ class EntrypointContainer(private val metadata: Metadata) : GroovyObjectSupport(
         return null
     }
 
-    override fun toJson(context: JsonSerializationContext): JsonElement {
-        return context.serialize(this.entrypoints)
+    override fun toJson(): JsonElement = JsonObject().also {json ->
+        this.entrypoints!!.forEach {(entrypoint, targets) ->
+            json.add(entrypoint, JsonArray().also {array ->
+                targets.forEach {target ->
+                    target.toJson().forEach(array::add)
+                }
+            })
+        }
     }
 
     companion object {

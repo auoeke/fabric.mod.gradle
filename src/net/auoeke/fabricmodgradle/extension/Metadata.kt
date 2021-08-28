@@ -68,7 +68,7 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
                 directory.walkTopDown().filter {it.isFile}.associateTo(types) {file -> ClassInfo(file.inputStream()).let {it.name to it}}
             }
 
-            types.keys.toSet().forEach {
+            types.keys.toTypedArray().forEach {
                 processInterfaces(types, it)
             }
         }
@@ -214,7 +214,6 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
         this.custom.configure(values)
     }
 
-    @Override
     override fun toJson(context: JsonSerializationContext): JsonElement {
         val json = JsonObject()
 

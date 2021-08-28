@@ -8,16 +8,18 @@ group = "net.auoeke"
 version = "1.3.4"
 description = "fabric-mod-gradle's test mod"
 
-sourceSets {
-    empty {}
-    comprehensive {}
+java {
+    sourceSets {
+        empty {}
+        comprehensive {}
 
-    all {set ->
-        groovy.srcDir("src/$name")
-        resources.srcDir("resources")
+        all {set ->
+            groovy.srcDir("src/$name")
+            resources.srcDir("resources")
 
-        if (set !== main) {
-            ["compileClasspath", "runtimeClasspath"].each {set[it] += main[it]}
+            if (set !== main) {
+                ["compileClasspath", "runtimeClasspath"].each {set[it] += main[it]}
+            }
         }
     }
 }
@@ -28,6 +30,7 @@ dependencies {
     modImplementation("net.fabricmc:fabric-loader:latest.integration")
 
     implementation(localGroovy())
+    implementation("net.fabricmc:fabric-language-groovy:latest.integration")
 }
 
 mod {
@@ -106,6 +109,11 @@ mod {
                 "net.auoeke.testmod.Main2"
             ],
 
+            client: [groovy: [
+                "net.auoeke.testmod.GroovyEntrypoint",
+                "net.auoeke.testmod.GroovyEntrypoint2"
+            ]],
+            /* or
             client: [
                 adapter: "groovy",
                 // May be an array or a string.
@@ -113,14 +121,9 @@ mod {
                     "net.auoeke.testmod.GroovyEntrypoint",
                     "net.auoeke.testmod.GroovyEntrypoint2"
                 ]
-            ],
-            /* or
-            client: [groovy: [
-                "net.auoeke.testmod.GroovyEntrypoint",
-                "net.auoeke.testmod.GroovyEntrypoint2"
-            ]] */
+            ] */
 
-            server: "net.auoeke.testmod.ClientEntrypoint",
+            server: [kotlin: "net.auoeke.testmod.ClientEntrypoint"],
             "mm:early_risers": "net.auoeke.testmod.EarlyRiser"
         )
 

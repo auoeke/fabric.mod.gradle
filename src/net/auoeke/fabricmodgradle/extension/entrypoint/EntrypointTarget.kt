@@ -5,27 +5,34 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
+import net.auoeke.fabricmodgradle.json
 import net.auoeke.fabricmodgradle.string
 
-@Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST")
-class EntrypointTarget(var value: List<String>? = null, var adapter: String? = null) : JsonSerializable {
-    @Override
-    override fun toJson(): JsonElement {
-        val value = if (this.value!!.size == 1) JsonPrimitive(this.value!![0]) else JsonArray().also {
-            this.value!!.forEach(it::add)
-        }
+@Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST", "JoinDeclarationAndAssignment")
+class EntrypointTarget() {
+    var adapter: String? = null
+    lateinit var value: List<String>
 
+    fun toJson(): List<JsonElement> {
         if (this.adapter === null) {
-            return value
+            return if (this.value.size == 1) listOf(JsonPrimitive(this.value.first())) else this.value.map(::JsonPrimitive)
         }
 
-        val json = JsonObject()
-        json.add("adapter", JsonPrimitive(this.adapter))
-        json.add("value", value)
-
-        return json
+        return ArrayList<JsonElement>().also {objects ->
+            this.value.forEach {target ->
+                objects.add(JsonObject().also {
+                    it.add("adapter", this.adapter.json)
+                    it.add("value", target.json)
+                })
+            }
+        }
     }
 
-    constructor(value: String, adapter: String? = null) : this(listOf(value), adapter)
+    constructor(value: List<String>, adapter: String? = null) : this() {
+        this.value = value
+        this.adapter = adapter
+    }
+
+    constructor(value: String) : this(listOf(value))
     constructor(map: Map<String, *>) : this(map["value"].let {value -> if (value is List<*>) value.map {it.string} else listOf(value.string)}, map["adapter"].string)
 }

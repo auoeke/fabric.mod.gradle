@@ -1,0 +1,11 @@
+[16:44:22] [main/INFO] (FabricLoader) Loading for game Minecraft 1.17.1
+[16:44:22] [main/FATAL] (Fabric|Loader) A critical error occurred
+net.fabricmc.loader.discovery.ModResolutionException: Duplicate versions for mod ID 'fabricloader': [0.10.8 at /home/x/projects/java/fabric-mod-gradle/build/tmp/test/work/.gradle-test-kit/caches/modules-2/files-2.1/net.fabricmc/fabric-loader/0.10.8/b93158ceedb8dbb61969299612a14002f31ec0a1/fabric-loader-0.10.8.jar], [0.11.6 at /home/x/projects/java/fabric-mod-gradle/test/project/.gradle/loom-cache/remapped_mods/net_fabricmc_yarn_1_17_1_1_17_1_build_39_v2/net/fabricmc/fabric-loader/0.11.6/fabric-loader-0.11.6.jar]
+	at net.fabricmc.loader.discovery.ModCandidateSet.toSortedSet(ModCandidateSet.java:100) ~[fabric-loader-0.11.6.jar:?]
+	at net.fabricmc.loader.discovery.ModResolver.findCompatibleSet(ModResolver.java:115) ~[fabric-loader-0.11.6.jar:?]
+	at net.fabricmc.loader.discovery.ModResolver.resolve(ModResolver.java:832) ~[fabric-loader-0.11.6.jar:?]
+	at net.fabricmc.loader.FabricLoader.setup(FabricLoader.java:195) ~[fabric-loader-0.11.6.jar:?]
+	at net.fabricmc.loader.FabricLoader.load(FabricLoader.java:185) [fabric-loader-0.11.6.jar:?]
+	at net.fabricmc.loader.launch.knot.Knot.init(Knot.java:132) [fabric-loader-0.11.6.jar:?]
+	at net.fabricmc.loader.launch.knot.KnotClient.main(KnotClient.java:28) [fabric-loader-0.11.6.jar:?]
+	at net.fabricmc.devlaunchinjector.Main.main(Main.java:86) [dev-launch-injector-0.2.1+build.8.jar:?]

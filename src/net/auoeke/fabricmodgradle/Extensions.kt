@@ -2,6 +2,7 @@
 
 package net.auoeke.fabricmodgradle
 
+import com.google.gson.JsonPrimitive
 import groovy.lang.Closure
 import org.gradle.api.Action
 import org.gradle.api.Project
@@ -58,3 +59,5 @@ inline fun String.endsWithAny(vararg suffixes: String): Boolean {
 
     return false
 }
+
+inline val String?.json get() = JsonPrimitive(this)

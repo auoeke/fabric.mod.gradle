@@ -6,7 +6,15 @@ import java.io.File
 
 class FabricModGradleTest {
     @Test
-    fun run() {
-        GradleRunner.create().withProjectDir(File("test/project")).withDebug(true).withPluginClasspath().withArguments("--stacktrace", "classes", "emptyClasses", "comprehensiveClasses").build()
+    fun compile() {
+        this.run("classes", "emptyClasses", "comprehensiveClasses")
     }
+
+//    @Test
+    fun run() {
+        this.run("runClient")
+    }
+
+    private fun runner(vararg args: String) = GradleRunner.create().withProjectDir(File("test/project")).withDebug(true).withPluginClasspath().withArguments(listOf("--stacktrace") + args).forwardOutput()
+    private fun run(vararg args: String) = this.runner(*args).build()
 }

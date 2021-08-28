@@ -10,7 +10,6 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 class FabricModGradle : Plugin<Project> {
-    @Override
     override fun apply(project: Project) {
         project.extensions.add("mod", Extension(project))
     }
