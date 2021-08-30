@@ -33,145 +33,155 @@ dependencies {
     implementation("net.fabricmc:fabric-language-groovy:latest.integration")
 }
 
+// Most mods exist only in the main source set. The top-level extension "mod" is a shortcut to the main source set's extension of the same name.
 mod {
-    main {
-        // ID, version and description are inferred from the project.
-        name = "test mod"
+    // ID, version and description are inferred from the project.
+    name = "test mod"
 
-        author("auoeke") {
-            email = "me@auoeke.net"
-            irc = "todo"
-            homepage = "https://auoeke.net"
-            issues = "https://git.auoeke.net"
-            sources = "https://git.auoeke.net"
-        }
-
-        license("GNU LGPL 3.0")
-        icon("assets/testmod/icon.png")
-
-        entrypoints {
-            main("net.auoeke.testmod.MainEntrypoint")
-        }
-
-        depends("fabric-language-groovy": "*")
+    author("auoeke") {
+        email = "me@auoeke.net"
+        irc = "todo"
+        homepage = "https://auoeke.net"
+        issues = "https://git.auoeke.net"
+        sources = "https://git.auoeke.net"
     }
 
-    empty {}
+    license("GNU LGPL 3.0")
+    icon("assets/testmod/icon.png")
 
-    comprehensive {
-        id = "testmod"
-        version = "1.3.4"
-        name = "test mod"
-        description = "fabric-mod-gradle's test mod: comprehensive demonstration"
+    entrypoints {
+        main("net.auoeke.testmod.MainEntrypoint")
+    }
 
-        contact {
-            email = "blockdestroyer68@example.net"
-            irc = "irc://irc.example.net:6667/fabric-mod-gradle"
-            homepage = "https://example.net"
-            issues = "https://git.auoeke.net/fabric-mod-gradle"
-            sources = "https://git.auoeke.net/fabric-mod-gradle/issues"
-        }
+    depends("fabric-language-groovy": "*")
+}
 
-        author("auoeke") {
-            email = "me@auoeke.net"
-            irc = "todo"
-            homepage = "https://auoeke.net"
-            issues = "https://git.auoeke.net"
-            sources = "https://git.auoeke.net"
-        }
+// Mods in other source sets can be configured here.
+java {
+    sourceSets {
+        empty {}
 
-        contributors {
-            example {
-                email = "example@example.net"
-                irc = "example"
-                // other contact details
+        comprehensive {
+            mod {
+                id = "testmod"
+                version = "1.3.4"
+                name = "test mod"
+                description = "fabric-mod-gradle's test mod: comprehensive demonstration"
+
+                contact {
+                    email = "blockdestroyer68@example.net"
+                    irc = "irc://irc.example.net:6667/fabric-mod-gradle"
+                    homepage = "https://example.net"
+                    issues = "https://git.auoeke.net/fabric-mod-gradle"
+                    sources = "https://git.auoeke.net/fabric-mod-gradle/issues"
+                }
+
+                author("auoeke") {
+                    email = "me@auoeke.net"
+                    irc = "todo"
+                    homepage = "https://auoeke.net"
+                    issues = "https://git.auoeke.net"
+                    sources = "https://git.auoeke.net"
+                }
+
+                contributors {
+                    example {
+                        email = "example@example.net"
+                        irc = "example"
+                        // other contact details
+                    }
+                    example2 {}
+                }
+                /* or
+                contributor("example") {
+                    email = "example@example.net"
+                    irc = "example"
+                }
+                contributor("example2") */
+
+                contributor("blockdestroyer68")
+
+                license("GNU LGPL 3.0", "Apache 2.0")
+
+                icon("assets/testmod/icon.png")
+                // or
+                // icon(64: "assets/testmod/icon.png", 128: "assets/testmod/icon128.png", ...)
+
+                entrypoints(
+                    main: [
+                        "net.auoeke.testmod.Main",
+                        "net.auoeke.testmod.Main2"
+                    ],
+
+                    client: [groovy: [
+                        "net.auoeke.testmod.GroovyEntrypoint",
+                        "net.auoeke.testmod.GroovyEntrypoint2"
+                    ]],
+                    /* or
+                    client: [
+                        adapter: "groovy",
+                        // May be an array or a string.
+                        value: [
+                            "net.auoeke.testmod.GroovyEntrypoint",
+                            "net.auoeke.testmod.GroovyEntrypoint2"
+                        ]
+                    ] */
+
+                    server: [
+                        "net.auoeke.testmod.Main",
+                        [kotlin: "net.auoeke.testmod.ServerEntrypoint"]
+                    ],
+
+                    "mm:early_risers": "net.auoeke.testmod.EarlyRiser"
+                )
+
+                languageAdapters {
+                    kotlin = "net.fabricmc.language.kotlin.KotlinAdapter"
+                }
+
+                languageAdapter("groovy", "net.fabricmc.language.groovy.GroovyLanguageAdapter")
+
+                custom {
+                    object {
+                        propertyAssignment = ["a", "b", "c"]
+                        methodInvocation("D", "E") // The arguments are wrapped into an array; equivalent to the below.
+                        methodInvocationAlt(["D", "E"])
+                        it["indexPropertyAssignment"] = true // Don't do this.
+                        "hyphenated-property" "invocation" // This is not recommended; equivalent to the below.
+                        "hyphenated-property-wrapped"("invocation")
+                    }
+                }
+                /* or
+                custom(object: [
+                    propertyAssignment: ["a", "b", "c"],
+                    methodInvocation: ["D", "E"],
+                    methodInvocationAlt: ["D", "E"],
+                    indexPropertyAssignment: true,
+                    "hyphenated-property": "invocation",
+                    "hyphenated-property-wrapped": "invocation"
+                ]) */
+
+                mixin("testmod.mixins.json")
+
+                mixin {
+                    client("client.mixins.json")
+                    server("server.mixins.json")
+                }
+                /* or
+                mixin("client", "client.mixins.json")
+                mixin("server", "server.mixins.json") */
+
+                depends(
+                    minecraft: ["1.16.5", "1.17", "1.17.1"],
+                    fabricloader: "*"
+                )
+
+                recommends(limitless: "1.5.0")
+                suggests(sodium: "*")
+                conflicts("hyphenated-mod-id": ["0.1.2", "1.2.3"])
+
+                jars("jars/test0.jar", "jars/test1.jar")
             }
-            example2 {}
         }
-        /* or
-        contributor("example") {
-            email = "example@example.net"
-            irc = "example"
-        }
-        contributor("example2") */
-
-        contributor("blockdestroyer68")
-
-        license("GNU LGPL 3.0", "Apache 2.0")
-
-        icon("assets/testmod/icon.png")
-        // or
-        // icon(64: "assets/testmod/icon.png", 128: "assets/testmod/icon128.png", ...)
-
-        entrypoints(
-            main: [
-                "net.auoeke.testmod.Main",
-                "net.auoeke.testmod.Main2"
-            ],
-
-            client: [groovy: [
-                "net.auoeke.testmod.GroovyEntrypoint",
-                "net.auoeke.testmod.GroovyEntrypoint2"
-            ]],
-            /* or
-            client: [
-                adapter: "groovy",
-                // May be an array or a string.
-                value: [
-                    "net.auoeke.testmod.GroovyEntrypoint",
-                    "net.auoeke.testmod.GroovyEntrypoint2"
-                ]
-            ] */
-
-            server: [kotlin: "net.auoeke.testmod.ClientEntrypoint"],
-            "mm:early_risers": "net.auoeke.testmod.EarlyRiser"
-        )
-
-        languageAdapters {
-            kotlin = "net.fabricmc.language.kotlin.KotlinAdapter"
-        }
-
-        languageAdapter("groovy", "net.fabricmc.language.groovy.GroovyLanguageAdapter")
-
-        custom {
-            object {
-                propertyAssignment = ["a", "b", "c"]
-                methodInvocation("D", "E") // The arguments are wrapped into an array; equivalent to the below.
-                methodInvocationAlt(["D", "E"])
-                it["indexPropertyAssignment"] = true // Don't do this.
-                "hyphenated-property" "invocation" // This is not recommended; equivalent to the below.
-                "hyphenated-property-wrapped"("invocation")
-            }
-        }
-        /* or
-        custom(object: [
-            propertyAssignment: ["a", "b", "c"],
-            methodInvocation: ["D", "E"],
-            methodInvocationAlt: ["D", "E"],
-            indexPropertyAssignment: true,
-            "hyphenated-property": "invocation",
-            "hyphenated-property-wrapped": "invocation"
-        ]) */
-
-        mixins("testmod.mixins.json")
-
-        mixins {
-            client("client.mixins.json")
-            server("server.mixins.json")
-        }
-        /* or
-        mixins("client", "client.mixins.json")
-        mixins("server", "server.mixins.json") */
-
-        depends(
-            minecraft: ["1.16.5", "1.17", "1.17.1"],
-            fabricloader: "*"
-        )
-
-        recommends(limitless: "1.5.0")
-        suggests(sodium: "*")
-        conflicts("hyphenated-mod-id": ["0.1.2", "1.2.3"])
-
-        jars("jars/test0.jar", "jars/test1.jar")
     }
 }

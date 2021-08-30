@@ -26,7 +26,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 
 @Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST", "unused")
-class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @Transient private val extension: Extension) : JsonSerializable {
+class Metadata(@Transient val project: Project, @Transient val set: SourceSet) : JsonSerializable {
     var schemaVersion: Int = 1
     var id: String = this.project.name
     var version: String = this.project.version.string
@@ -81,18 +81,24 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
         this.configure(this.entrypoints, configuration)
     }
 
-    fun entrypoints(entrypoints: Map<String, *>) {
+    fun entrypoints(entrypoints: Map<*, *>) {
         if (this.entrypoints.entrypoints !== null) {
             throw IllegalStateException("Entrypoints have already been defined.")
         }
 
-        this.entrypoints.entrypoints = entrypoints.mapValues {entry ->
-            when (entry.value) {
-                is String -> mutableListOf(EntrypointTarget(entry.value.string))
-                is List<*> -> (entry.value as List<*>).map {if (it is Map<*, *>) EntrypointTarget(it as Map<String, *>) else EntrypointTarget(it.string)}.toMutableList()
-                else -> mutableListOf(EntrypointTarget(entry.value.requireInstance<Map<String, *>>()))
+        this.entrypoints.entrypoints = entrypoints.entries.associate {entry ->
+            entry.key.string to entry.value.iterable.let {value ->
+                value.flatMap {
+                    when (it) {
+                        is Map<*, *> -> when ("value") {
+                            in it -> listOf(EntrypointTarget(it))
+                            else -> it.map {entry -> EntrypointTarget(entry.value.iterable.map(Any?::string), entry.key.string)}
+                        }
+                        else -> listOf(EntrypointTarget(it.string))
+                    }
+                } as MutableList
             }
-        }.toMutableMap()
+        } as MutableMap
     }
 
     fun jars(vararg paths: String) {
@@ -111,19 +117,19 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
         this.languageAdapters.setProperty(key, type)
     }
 
-    fun mixins(configuration: Closure<*>) {
+    fun mixin(configuration: Closure<*>) {
         this.configure(this.mixins, configuration)
     }
 
-    fun mixins(configuration: String) {
-        this.mixins(null, configuration)
+    fun mixin(configuration: String) {
+        this.mixin(null, configuration)
     }
 
-    fun mixins(vararg configurations: String) {
-        configurations.forEach(this::mixins)
+    fun mixin(vararg configurations: String) {
+        configurations.forEach(this::mixin)
     }
 
-    fun mixins(environment: String? = null, configuration: String) {
+    fun mixin(environment: String? = null, configuration: String) {
         this.mixins.add(environment, configuration)
     }
 
@@ -193,13 +199,13 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
 
     fun icon(icons: MutableMap<Int?, String>) {
         require(!icons.containsValue(null as String?)) {"null values are not allowed."}
-        require(icons.size <= 1 || icons.contains(null)) {"An icon for all sizes was already specified."}
+        require(icons.size <= 1 || null in icons) {"An icon for all sizes was already specified."}
 
         this.icon.icons = icons
     }
 
     fun icon(path: String) {
-        if (this.icon.icons.isNotEmpty()) {
+        if (!this.icon.icons.empty) {
             throw IllegalStateException("An icon for a specific size was already specified.")
         }
 

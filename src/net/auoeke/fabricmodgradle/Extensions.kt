@@ -38,7 +38,7 @@ inline fun <T, P, V> closure(lambda: T): Closure<V> where T : (P) -> V = object 
     }
 }
 
-inline fun <reified T> Any?.requireInstance(): T {
+inline fun <reified T> Any?.cast(): T {
     if (!T::class.isInstance(this)) {
         throw IllegalArgumentException("${if (this === null) "null" else "$this of ${this.javaClass}"} was passed where a ${T::class.qualifiedName} instance was expected.")
     }
@@ -58,6 +58,11 @@ inline fun String.endsWithAny(vararg suffixes: String): Boolean {
     }
 
     return false
+}
+
+inline val Any?.iterable get() = when (this) {
+    is Iterable<*> -> this
+    else -> listOf(this)
 }
 
 inline val String?.json get() = JsonPrimitive(this)

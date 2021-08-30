@@ -13,17 +13,15 @@ class EntrypointTarget() {
     var adapter: String? = null
     lateinit var value: List<String>
 
-    fun toJson(): List<JsonElement> {
-        if (this.adapter === null) {
-            return if (this.value.size == 1) listOf(JsonPrimitive(this.value.first())) else this.value.map(::JsonPrimitive)
+    fun toJson(): List<JsonElement> = when {
+        this.adapter === null -> when (this.value.size) {
+            1 -> listOf(this.value.first().json)
+            else -> this.value.map(::JsonPrimitive)
         }
-
-        return ArrayList<JsonElement>().also {objects ->
-            this.value.forEach {target ->
-                objects.add(JsonObject().also {
-                    it.add("adapter", this.adapter.json)
-                    it.add("value", target.json)
-                })
+        else -> this.value.map {target ->
+            JsonObject().also {
+                it.add("adapter", this.adapter.json)
+                it.add("value", target.json)
             }
         }
     }
@@ -33,6 +31,7 @@ class EntrypointTarget() {
         this.adapter = adapter
     }
 
+    constructor(value: String, adapter: String?) : this(listOf(value), adapter)
     constructor(value: String) : this(listOf(value))
-    constructor(map: Map<String, *>) : this(map["value"].let {value -> if (value is List<*>) value.map {it.string} else listOf(value.string)}, map["adapter"].string)
+    constructor(map: Map<*, *>) : this(map["value"].let {value -> if (value is List<*>) value.map {it.string} else listOf(value.string)}, map["adapter"].string)
 }
