@@ -1,8 +1,7 @@
 package net.auoeke.fabricmodgradle.extension
 
-import com.google.gson.JsonElement
-import com.google.gson.JsonObject
-import com.google.gson.JsonSerializationContext
+import com.google.gson.*
+import com.google.gson.stream.JsonWriter
 import groovy.lang.Closure
 import net.auoeke.fabricmodgradle.*
 import net.auoeke.fabricmodgradle.extension.contact.Contact
@@ -12,13 +11,20 @@ import net.auoeke.fabricmodgradle.extension.entrypoint.EntrypointContainer
 import net.auoeke.fabricmodgradle.extension.entrypoint.EntrypointTarget
 import net.auoeke.fabricmodgradle.extension.json.Container
 import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
+import net.auoeke.fabricmodgradle.extension.json.JsonSerializableAdapter
 import net.auoeke.fabricmodgradle.extension.misc.*
 import net.auoeke.fabricmodgradle.extension.mixin.MixinContainer
 import net.auoeke.fabricmodgradle.extension.relation.RelationContainer
+import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.Task
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceSet
+import org.gradle.api.tasks.TaskAction
 import org.gradle.util.Configurable
 import org.gradle.util.internal.ConfigureUtil
+import java.io.File
+import java.io.StringWriter
 
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -39,8 +45,8 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet) :
             field = version.string
         }
     lateinit var name: String
-    var description: String? = null
 
+    var description: String? = null
     private val contact: Contact = Contact()
     private val authors: PersonContainer = PersonContainer(this.project)
     private val contributors: PersonContainer = PersonContainer(this.project)
@@ -55,7 +61,6 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet) :
             field = environment
         }
     private val entrypoints: EntrypointContainer = EntrypointContainer(this)
-
     private val languageAdapters: LanguageAdapterContainer = LanguageAdapterContainer()
     private var custom: CustomObject = CustomObject(this.project)
     private val mixins: MixinContainer = MixinContainer()

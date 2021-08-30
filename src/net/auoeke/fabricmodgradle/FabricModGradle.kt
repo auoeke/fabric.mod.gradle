@@ -16,39 +16,12 @@ import java.io.StringWriter
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class FabricModGradle : Plugin<Project> {
     override fun apply(project: Project) {
-        project.extensions.getByType(JavaPluginExtension::class.java).sourceSets.also {
-            it.all {set ->
-                val output = project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json")
-                val outputDirectory = output.parentFile
-
-                set.extensions.add("mod", Metadata(project, set).also {metadata ->
-                    project.tasks.getByName(set.classesTaskName).doLast {
-                        if (metadata.initialized == true) {
-                            set.output.dir(outputDirectory.apply {mkdirs()})
-
-                            val stringWriter = StringWriter()
-                            gson.toJson(metadata, Metadata::class.java, JsonWriter(stringWriter).apply {setIndent("    ")})
-                            output.writeText(stringWriter.toString())
-                        }
-                    }
-                })
-
-                project.gradle.buildFinished {
-                    if (outputDirectory.exists()) {
-                        set.runtimeClasspath += project.files(outputDirectory)
-                    }
-                }
-            }
-        }.also {project.extensions.add("mod", it.getByName("main").extensions.getByName("mod"))}
+        project.extensions.getByType(JavaPluginExtension::class.java).sourceSets.all {
+            project.tasks.create(it.getTaskName("generate", "metadata"), GenerateMetadata::class.java, it)
+        }
     }
 
     companion object {
-        val gson: Gson = GsonBuilder()
-            .setPrettyPrinting()
-            .disableHtmlEscaping()
-            .registerTypeHierarchyAdapter(JsonSerializable::class.java, JsonSerializableAdapter())
-            .create()
-
         fun configure(project: Project, obj: Any, configurator: Closure<*>?): Any? {
             var result: Any? = null
             project.configure(obj, configurator?.andThen(closure {it: Any? -> result = it}))
