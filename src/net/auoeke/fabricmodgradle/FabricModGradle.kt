@@ -15,20 +15,16 @@ import java.io.StringWriter
 
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class FabricModGradle : Plugin<Project> {
-    private val metadata: MutableMap<SourceSet, Metadata> = HashMap()
-
     override fun apply(project: Project) {
         project.extensions.getByType(JavaPluginExtension::class.java).sourceSets.also {
             it.all {set ->
-                set.extensions.add("mod", Metadata(project, set).also {metadata ->
-                    this.metadata[set] = metadata
+                val output = project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json")
+                val outputDirectory = output.parentFile
 
+                set.extensions.add("mod", Metadata(project, set).also {metadata ->
                     project.tasks.getByName(set.classesTaskName).doLast {
                         if (metadata.initialized == true) {
-                            val output = project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json")
-                            val outputDirectory = output.parentFile.apply {mkdirs()}
-                            set.output.dir(outputDirectory)
-                            set.runtimeClasspath += project.files(outputDirectory)
+                            set.output.dir(outputDirectory.apply {mkdirs()})
 
                             val stringWriter = StringWriter()
                             gson.toJson(metadata, Metadata::class.java, JsonWriter(stringWriter).apply {setIndent("    ")})
@@ -36,6 +32,12 @@ class FabricModGradle : Plugin<Project> {
                         }
                     }
                 })
+
+                project.gradle.buildFinished {
+                    if (outputDirectory.exists()) {
+                        set.runtimeClasspath += project.files(outputDirectory)
+                    }
+                }
             }
         }.also {project.extensions.add("mod", it.getByName("main").extensions.getByName("mod"))}
     }
