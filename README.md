@@ -3,6 +3,7 @@ No more `"version": "${version}"` in your JSON either. :triumph: Instead, fabric
 With that said, these defaults are overridable. And of course, `schemaVersion` is set to `1`. :rocket:
 
 After all classes have been compiled, the metadata are generated (for most people) in `build/generated/resources/main`.
+If you choose to use your IDE instead of Gradle for compilation, then you will have to either set a prerun hook for the `generateMetadata` task or run it manually whenever you modify a `mod` extension.
 
 Despite this plugin's name, you do not need a separate file for your metadata but you may make one.
 
