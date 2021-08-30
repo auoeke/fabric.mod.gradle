@@ -75,7 +75,7 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet) :
     private val types: MutableMap<String, ClassInfo> by lazy {
         HashMap<String, ClassInfo>().also {types ->
             this.set.output.classesDirs.forEach {directory ->
-                directory.walkTopDown().filter {it.isFile}.associateTo(types) {file -> ClassInfo(file.inputStream()).let {it.name to it}}
+                directory.walkTopDown().filter {it.isFile && it.extension == "class"}.associateTo(types) {file -> ClassInfo(file.inputStream()).let {it.name to it}}
             }
 
             types.keys.toTypedArray().forEach {
