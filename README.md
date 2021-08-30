@@ -7,3 +7,6 @@ After all classes have been compiled, the metadata are generated (for most peopl
 Despite this plugin's name, you do not need a separate file for your metadata but you may make one.
 
 See [the test project](./test/project) for examples.
+
+Mixin configuration still has to be done through JSON but I intend to change that and make it fully automatic by default.
+
