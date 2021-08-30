@@ -27,6 +27,7 @@ open class GenerateMetadata @Inject constructor(private val set: SourceSet) : De
     }
 
     init {
+        this.group = "fabric"
         this.project.tasks.getByName(this.set.classesTaskName).also {
             this.dependsOn(it)
             it.finalizedBy(this)
