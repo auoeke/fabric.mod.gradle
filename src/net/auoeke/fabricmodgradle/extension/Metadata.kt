@@ -34,7 +34,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 
 @Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST", "unused")
-class Metadata(@Transient val project: Project, @Transient val set: SourceSet) : JsonSerializable, Configurable<Any> {
+class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @Transient private val outputDirectory: File) : JsonSerializable, Configurable<Any> {
     @Transient
     var initialized: Boolean? = null
 
@@ -265,6 +265,8 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet) :
             this.id = this.project.name
             this.version = this.project.version.string
             this.description = this.project.description
+
+            this.project.dependencies.add(this.set.runtimeOnlyConfigurationName, this.project.files(this.outputDirectory))
         }
 
         return ConfigureUtil.configureSelf(configurator, this) ?: this
