@@ -26,14 +26,16 @@ class FabricModGradle : Plugin<Project> {
                     this.metadata[set] = metadata
 
                     project.tasks.getByName(set.classesTaskName).doLast {
-                        val output = project.buildDir.toPath().resolve("generated/resources/${set.name}/fabric.mod.json")
-                        set.output.dir(output.parent.createDirectories())
+                        if (metadata.initialized == true) {
+                            val output = project.buildDir.toPath().resolve("generated/resources/${set.name}/fabric.mod.json")
+                            set.output.dir(output.parent.createDirectories())
 
-                        val stringWriter = StringWriter()
-                        val jsonWriter = JsonWriter(stringWriter)
-                        jsonWriter.setIndent("    ")
-                        gson.toJson(metadata, Metadata::class.java, jsonWriter)
-                        output.writeText(stringWriter.buffer)
+                            val stringWriter = StringWriter()
+                            val jsonWriter = JsonWriter(stringWriter)
+                            jsonWriter.setIndent("    ")
+                            gson.toJson(metadata, Metadata::class.java, jsonWriter)
+                            output.writeText(stringWriter.buffer)
+                        }
                     }
                 })
             }
@@ -47,9 +49,9 @@ class FabricModGradle : Plugin<Project> {
             .registerTypeHierarchyAdapter(JsonSerializable::class.java, JsonSerializableAdapter())
             .create()
 
-        fun <V> configure(project: Project, obj: Any, configurator: Closure<V>): V? {
-            var result: V? = null
-            project.configure(obj, configurator.curry(closure {it: V? -> result = it}))
+        fun configure(project: Project, obj: Any, configurator: Closure<*>?): Any? {
+            var result: Any? = null
+            project.configure(obj, configurator?.andThen(closure {it: Any? -> result = it}))
 
             return result
         }

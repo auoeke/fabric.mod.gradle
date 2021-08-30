@@ -17,6 +17,8 @@ import net.auoeke.fabricmodgradle.extension.mixin.MixinContainer
 import net.auoeke.fabricmodgradle.extension.relation.RelationContainer
 import org.gradle.api.Project
 import org.gradle.api.tasks.SourceSet
+import org.gradle.util.Configurable
+import org.gradle.util.internal.ConfigureUtil
 
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
@@ -26,15 +28,16 @@ import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 
 @Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST", "unused")
-class Metadata(@Transient val project: Project, @Transient val set: SourceSet) : JsonSerializable {
-    var schemaVersion: Int = 1
-    var id: String = this.project.name
-    var version: String = this.project.version.string
+class Metadata(@Transient val project: Project, @Transient val set: SourceSet) : JsonSerializable, Configurable<Any> {
+    var initialized: Boolean? = null
+    var schemaVersion: Int = 0
+    lateinit var id: String
+    var version: String? = null
         set(version) {
             field = version.string
         }
-    var name: String? = null
-    var description: String? = this.project.description
+    lateinit var name: String
+    var description: String? = null
 
     private val contact: Contact = Contact()
     private val authors: PersonContainer = PersonContainer(this.project)
@@ -247,7 +250,20 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet) :
         return json
     }
 
-    private fun <V> configure(obj: Any, configuration: Closure<V>): V? = FabricModGradle.configure(this.project, obj, configuration)
+    override fun configure(configurator: Closure<*>?): Any {
+        if (this.initialized != true) {
+            this.initialized = true
+
+            this.schemaVersion = 1
+            this.id = this.project.name
+            this.version = this.project.version.string
+            this.description = this.project.description
+        }
+
+        return ConfigureUtil.configureSelf(configurator, this) ?: this
+    }
+
+    private fun configure(obj: Any, configuration: Closure<*>?): Any? = FabricModGradle.configure(this.project, obj, configuration)
 
     private fun info(types: MutableMap<String, ClassInfo>, type: String): ClassInfo {
         return types[type] ?: this.classPathTypes.computeIfAbsent(type) compute@{

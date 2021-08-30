@@ -27,13 +27,13 @@ inline fun <reified T> catch(action: () -> Unit) {
     }
 }
 
-inline fun <T, P, V> closure(lambda: T): Closure<V> where T : (P) -> V = object : Closure<V>(lambda) {
-    override fun call(arg: Any): V {
-        return (this.thisObject as T)(arg as P)
+inline fun <T : (P) -> V, P, V> closure(lambda: T): Closure<V> = object : Closure<V>(lambda) {
+    override fun call(arg: Any?): V {
+        return (this.owner as T)(arg as P)
     }
 
     @Suppress("unused")
-    fun doCall(arg: Any): V {
+    fun doCall(arg: Any?): V {
         return this.doCall(arg)
     }
 }

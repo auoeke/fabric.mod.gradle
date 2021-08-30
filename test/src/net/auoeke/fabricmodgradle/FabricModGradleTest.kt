@@ -7,7 +7,7 @@ import java.io.File
 class FabricModGradleTest {
     @Test
     fun compile() {
-        this.run("classes", "emptyClasses", "comprehensiveClasses")
+        this.run("clean", "classes", "emptyClasses", "comprehensiveClasses")
     }
 
 //    @Test

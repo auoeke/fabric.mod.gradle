@@ -59,7 +59,9 @@ mod {
 // Mods in other source sets can be configured here.
 java {
     sourceSets {
-        empty {}
+        empty {
+            mod {}
+        }
 
         comprehensive {
             mod {
