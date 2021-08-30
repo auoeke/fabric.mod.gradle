@@ -29,7 +29,9 @@ import kotlin.io.path.inputStream
 
 @Suppress("MemberVisibilityCanBePrivate", "UNCHECKED_CAST", "unused")
 class Metadata(@Transient val project: Project, @Transient val set: SourceSet) : JsonSerializable, Configurable<Any> {
+    @Transient
     var initialized: Boolean? = null
+
     var schemaVersion: Int = 0
     lateinit var id: String
     var version: String? = null
