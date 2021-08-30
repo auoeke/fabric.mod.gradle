@@ -12,8 +12,6 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.SourceSet
 import java.io.StringWriter
-import kotlin.io.path.createDirectories
-import kotlin.io.path.writeText
 
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 class FabricModGradle : Plugin<Project> {
@@ -27,14 +25,13 @@ class FabricModGradle : Plugin<Project> {
 
                     project.tasks.getByName(set.classesTaskName).doLast {
                         if (metadata.initialized == true) {
-                            val output = project.buildDir.toPath().resolve("generated/resources/${set.name}/fabric.mod.json")
-                            set.output.dir(output.parent.createDirectories())
+                            val output = project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json").apply {mkdirs()}
+                            set.output.dir(output.parentFile)
+                            set.runtimeClasspath += project.files(output)
 
                             val stringWriter = StringWriter()
-                            val jsonWriter = JsonWriter(stringWriter)
-                            jsonWriter.setIndent("    ")
-                            gson.toJson(metadata, Metadata::class.java, jsonWriter)
-                            output.writeText(stringWriter.buffer)
+                            gson.toJson(metadata, Metadata::class.java, JsonWriter(stringWriter).apply {setIndent("    ")})
+                            output.writeText(stringWriter.toString())
                         }
                     }
                 })
