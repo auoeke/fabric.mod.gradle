@@ -26,8 +26,9 @@ class FabricModGradle : Plugin<Project> {
                     project.tasks.getByName(set.classesTaskName).doLast {
                         if (metadata.initialized == true) {
                             val output = project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json").apply {mkdirs()}
-                            set.output.dir(output.parentFile)
-                            set.runtimeClasspath += project.files(output)
+                            val outputDirectory = output.parentFile
+                            set.output.dir(outputDirectory)
+                            set.runtimeClasspath += project.files(outputDirectory)
 
                             val stringWriter = StringWriter()
                             gson.toJson(metadata, Metadata::class.java, JsonWriter(stringWriter).apply {setIndent("    ")})
