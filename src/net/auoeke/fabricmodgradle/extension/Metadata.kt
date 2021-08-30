@@ -273,19 +273,23 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet) :
     private fun configure(obj: Any, configuration: Closure<*>?): Any? = FabricModGradle.configure(this.project, obj, configuration)
 
     private fun info(types: MutableMap<String, ClassInfo>, type: String): ClassInfo {
-        return types[type] ?: this.classPathTypes.computeIfAbsent(type) compute@{
+        return types[type] ?: this.classPathTypes.computeIfAbsent(type) {
             val iterator = this.classPath.listIterator() as MutableListIterator
 
             iterator.forEach {
-                val filename = it.fileName
+                if (it.exists()) {
+                    val filename = it.fileName
 
-                when {
-                    filename !== null && filename.toString().endsWithAny(".jar", ".zip") -> FileSystems.newFileSystem(it).getPath("").also {root -> iterator.set(root)}
-                    else -> it
-                }.resolve("$type.class").also {file ->
-                    if (file.exists()) {
-                        return@compute ClassInfo(file.inputStream())
+                    when {
+                        filename !== null && filename.toString().endsWithAny(".jar", ".zip") -> FileSystems.newFileSystem(it).getPath("").also {root -> iterator.set(root)}
+                        else -> it
+                    }.resolve("$type.class").also {file ->
+                        if (file.exists()) {
+                            return@computeIfAbsent ClassInfo(file.inputStream())
+                        }
                     }
+                } else {
+                    iterator.remove()
                 }
             }
 
