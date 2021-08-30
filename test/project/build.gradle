@@ -1,39 +1,32 @@
 plugins {
     id("fabric-loom").version("latest.integration")
-    id("fabric-mod-gradle")
+    id("fabric.mod.gradle").version("latest.integration")
     id("groovy")
 }
 
 group = "net.auoeke"
 version = "1.3.4"
-description = "fabric-mod-gradle's test mod"
+description = "fabric.mod.gradle's test mod"
 
-java {
-    sourceSets {
-        empty {}
-        comprehensive {}
+sourceCompatibility = 16
+targetCompatibility = 16
 
-        all {set ->
-            groovy.srcDir("src/$name")
-            resources.srcDir("resources")
+// You probably don't need this if you don't know what it is.
+sourceSets {
+    empty {}
+    comprehensive {}
 
-            if (set !== main) {
-                ["compileClasspath", "runtimeClasspath"].each {set[it] += main[it]}
-            }
+    all {set ->
+        groovy.srcDir("src/$name")
+        resources.srcDir("resources")
+
+        if (set !== main) {
+            ["compileClasspath", "runtimeClasspath"].each {set[it] += main[it]}
         }
     }
 }
 
-dependencies {
-    minecraft("com.mojang:minecraft:1.17.1")
-    mappings("net.fabricmc:yarn:1.17.1+build.39:v2")
-    modImplementation("net.fabricmc:fabric-loader:latest.integration")
-
-    implementation(localGroovy())
-    implementation("net.fabricmc:fabric-language-groovy:latest.integration")
-}
-
-// Most mods exist only in the main source set. This is the extension for it.
+// Most mods exist only in the main source set. `mod` is the extension for it.
 mod {
     // ID, version and description are inferred from the project.
     name = "test mod"
@@ -57,20 +50,21 @@ mod {
 }
 
 // The metadata for a mod in a different source set can be accessed by the name "${sourceSet.name}Mod" where `sourceSet` is a source set.
+// If the extension for a source set is not used, then metadata will not be generated for it. This extension is used despite looking empty.
 emptyMod {}
 
 comprehensiveMod {
     id = "testmod"
     version = "1.3.4"
     name = "test mod"
-    description = "fabric-mod-gradle's test mod: comprehensive demonstration"
+    description = "fabric.mod.gradle's test mod: comprehensive demonstration"
 
     contact {
         email = "blockdestroyer68@example.net"
-        irc = "irc://irc.example.net:6667/fabric-mod-gradle"
+        irc = "irc://irc.example.net:6667/fabric.mod.gradle"
         homepage = "https://example.net"
-        issues = "https://git.auoeke.net/fabric-mod-gradle"
-        sources = "https://git.auoeke.net/fabric-mod-gradle/issues"
+        issues = "https://git.auoeke.net/fabric.mod.gradle"
+        sources = "https://git.auoeke.net/fabric.mod.gradle/issues"
     }
 
     author("auoeke") {
@@ -178,4 +172,21 @@ comprehensiveMod {
     conflicts("hyphenated-mod-id": ["0.1.2", "1.2.3"])
 
     jars("jars/test0.jar", "jars/test1.jar")
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+java {
+    withSourcesJar()
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:1.17.1")
+    mappings("net.fabricmc:yarn:1.17.1+build.39:v2")
+    modImplementation("net.fabricmc:fabric-loader:latest.integration")
+
+    implementation(localGroovy())
+    implementation("net.fabricmc:fabric-language-groovy:latest.integration")
 }

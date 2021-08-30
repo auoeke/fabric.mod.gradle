@@ -3,6 +3,7 @@ pluginManagement {
         mavenCentral()
 
         maven {url = "https://maven.fabricmc.net"}
+        maven {url = "https://maven.auoeke.net"}
     }
 }
 

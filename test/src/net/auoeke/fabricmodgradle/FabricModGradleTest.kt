@@ -17,7 +17,7 @@ class FabricModGradleTest {
         this.run("jar")
     }
 
-   @Test
+   // @Test
     fun run() {
         this.run("runClient")
     }

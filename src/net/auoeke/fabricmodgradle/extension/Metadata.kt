@@ -240,6 +240,7 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
                         "net/fabricmc/api/ModInitializer" -> this.entrypoints.add("main", type.binaryName)
                         "net/fabricmc/api/ClientModInitializer" -> this.entrypoints.add("client", type.binaryName)
                         "net/fabricmc/api/DedicatedServerModInitializer" -> this.entrypoints.add("server", type.binaryName)
+                        "net/fabricmc/loader/api/entrypoint/PreLaunchEntrypoint" -> this.entrypoints.add("preLaunch", type.binaryName)
                     }
                 }
             }

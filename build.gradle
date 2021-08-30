@@ -28,8 +28,8 @@ java {
 
 gradlePlugin {
     plugins {
-        "fabric-mod-gradle" {
-            id = "fabric-mod-gradle"
+        "fabric.mod.gradle" {
+            id = "fabric.mod.gradle"
             implementationClass = "net.auoeke.fabricmodgradle.FabricModGradle"
         }
     }
