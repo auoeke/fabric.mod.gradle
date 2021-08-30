@@ -11,11 +11,13 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
 import org.gradle.jvm.tasks.Jar
+import org.gradle.work.DisableCachingByDefault
 import java.io.File
 import java.io.StringWriter
 import javax.inject.Inject
 
-@Suppress("LeakingThis")
+@Suppress("LeakingThis", "UnstableApiUsage")
+@DisableCachingByDefault
 open class GenerateMetadata @Inject constructor(private val set: SourceSet) : DefaultTask() {
     private val output: File = this.project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json")
 
