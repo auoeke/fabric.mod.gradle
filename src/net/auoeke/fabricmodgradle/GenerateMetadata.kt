@@ -31,7 +31,7 @@ open class GenerateMetadata @Inject constructor(private val set: SourceSet) : De
             this.dependsOn(it)
             it.finalizedBy(this)
         }
-        (this.project.tasks.getByName(this.set.jarTaskName) as Jar).dependsOn(this)
+        (this.project.tasks.findByName(this.set.jarTaskName) as Jar?)?.dependsOn(this)
     }
 
     @TaskAction
