@@ -12,6 +12,11 @@ class FabricModGradleTest {
         this.run("clean", "classes", "emptyClasses", "comprehensiveClasses")
     }
 
+    @Test
+    fun jar() {
+        this.run("jar")
+    }
+
    @Test
     fun run() {
         this.run("runClient")

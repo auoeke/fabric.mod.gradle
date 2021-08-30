@@ -10,18 +10,13 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
+import org.gradle.jvm.tasks.Jar
 import java.io.File
 import java.io.StringWriter
 import javax.inject.Inject
 
+@Suppress("LeakingThis")
 open class GenerateMetadata @Inject constructor(private val set: SourceSet) : DefaultTask() {
-    init {
-        this.project.tasks.getByName(this.set.classesTaskName).also {
-            this.dependsOn(it)
-            it.finalizedBy(this)
-        }
-    }
-
     private val output: File = this.project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json")
 
     @OutputDirectory
@@ -29,6 +24,14 @@ open class GenerateMetadata @Inject constructor(private val set: SourceSet) : De
 
     private val metadata: Metadata = Metadata(this.project, this.set, this.outputDirectory).also {
         this.project.extensions.add(this.set.getTaskName(null, "mod"), it)
+    }
+
+    init {
+        this.project.tasks.getByName(this.set.classesTaskName).also {
+            this.dependsOn(it)
+            it.finalizedBy(this)
+        }
+        (this.project.tasks.getByName(this.set.jarTaskName) as Jar).dependsOn(this)
     }
 
     @TaskAction
