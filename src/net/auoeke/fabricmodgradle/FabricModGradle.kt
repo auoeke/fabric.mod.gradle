@@ -25,8 +25,8 @@ class FabricModGradle : Plugin<Project> {
 
                     project.tasks.getByName(set.classesTaskName).doLast {
                         if (metadata.initialized == true) {
-                            val output = project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json").apply {mkdirs()}
-                            val outputDirectory = output.parentFile
+                            val output = project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json")
+                            val outputDirectory = output.parentFile.apply {mkdirs()}
                             set.output.dir(outputDirectory)
                             set.runtimeClasspath += project.files(outputDirectory)
 
