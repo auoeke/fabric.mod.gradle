@@ -25,20 +25,19 @@ open class GenerateMetadata @Inject constructor(private val set: SourceSet) : De
     @Transient
     private val output: File = this.project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json")
 
-    @Transient
-    private val outputDirectory: File = this.output.parentFile
-
     private val metadata: Metadata = Metadata(this.project, this.set).also {
         this.project.extensions.add(this.set.getTaskName(null, "mod"), it)
     }
 
     @OutputDirectory
-    fun getOutput(): File = this.outputDirectory
+    val outputDirectory: File = this.output.parentFile
 
     @TaskAction
     fun generate() {
         if (this.metadata.initialized == true) {
             this.set.output.dir(this.outputDirectory.apply {mkdirs()})
+            this.project.dependencies.add(this.set.runtimeOnlyConfigurationName, this.project.files(this.outputDirectory))
+
             val stringWriter = StringWriter()
             gson.toJson(this.metadata, Metadata::class.java, JsonWriter(stringWriter).apply {setIndent("    ")})
             this.output.writeText(stringWriter.toString())

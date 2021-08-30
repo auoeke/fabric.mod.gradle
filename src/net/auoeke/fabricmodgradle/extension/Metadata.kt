@@ -272,29 +272,27 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet) :
 
     private fun configure(obj: Any, configuration: Closure<*>?): Any? = FabricModGradle.configure(this.project, obj, configuration)
 
-    private fun info(types: MutableMap<String, ClassInfo>, type: String): ClassInfo {
-        return types[type] ?: this.classPathTypes.computeIfAbsent(type) {
-            val iterator = this.classPath.listIterator() as MutableListIterator
+    private fun info(types: MutableMap<String, ClassInfo>, type: String): ClassInfo = types[type] ?: this.classPathTypes.computeIfAbsent(type) {
+        val iterator = this.classPath.listIterator() as MutableListIterator
 
-            iterator.forEach {
-                if (it.exists()) {
-                    val filename = it.fileName
+        iterator.forEach {
+            if (it.exists()) {
+                val filename = it.fileName
 
-                    when {
-                        filename !== null && filename.toString().endsWithAny(".jar", ".zip") -> FileSystems.newFileSystem(it).getPath("").also {root -> iterator.set(root)}
-                        else -> it
-                    }.resolve("$type.class").also {file ->
-                        if (file.exists()) {
-                            return@computeIfAbsent ClassInfo(file.inputStream())
-                        }
+                when {
+                    filename !== null && filename.toString().endsWithAny(".jar", ".zip") -> FileSystems.newFileSystem(it).getPath("").also {root -> iterator.set(root)}
+                    else -> it
+                }.resolve("$type.class").also {file ->
+                    if (file.exists()) {
+                        return@computeIfAbsent ClassInfo(file.inputStream())
                     }
-                } else {
-                    iterator.remove()
                 }
+            } else {
+                iterator.remove()
             }
-
-            throw ClassNotFoundException(type)
         }
+
+        throw ClassNotFoundException(type)
     }
 
     private fun processInterfaces(types: MutableMap<String, ClassInfo>, type: String?): Set<String> {

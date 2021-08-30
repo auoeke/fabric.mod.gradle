@@ -2,15 +2,17 @@ package net.auoeke.fabricmodgradle
 
 import org.gradle.testkit.runner.GradleRunner
 import org.junit.jupiter.api.Test
+import org.junit.platform.commons.annotation.Testable
 import java.io.File
 
+@Testable
 class FabricModGradleTest {
     @Test
     fun compile() {
         this.run("clean", "classes", "emptyClasses", "comprehensiveClasses")
     }
 
-//    @Test
+   @Test
     fun run() {
         this.run("runClient")
     }
