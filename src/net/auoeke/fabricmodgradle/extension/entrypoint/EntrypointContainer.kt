@@ -3,15 +3,15 @@ package net.auoeke.fabricmodgradle.extension.entrypoint
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
-import com.google.gson.JsonSerializationContext
 import groovy.lang.Closure
 import groovy.lang.GroovyObjectSupport
-import net.auoeke.fabricmodgradle.*
+import net.auoeke.fabricmodgradle.catch
+import net.auoeke.fabricmodgradle.emptyOrNull
 import net.auoeke.fabricmodgradle.extension.Metadata
 import net.auoeke.fabricmodgradle.extension.json.Container
 import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
+import net.auoeke.fabricmodgradle.string
 import java.lang.reflect.Method
-import kotlin.collections.ArrayList
 
 @Suppress("UNCHECKED_CAST")
 class EntrypointContainer(private val metadata: Metadata) : GroovyObjectSupport(), JsonSerializable, Container {

@@ -1,7 +1,8 @@
 package net.auoeke.fabricmodgradle.extension
 
-import com.google.gson.*
-import com.google.gson.stream.JsonWriter
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
+import com.google.gson.JsonSerializationContext
 import groovy.lang.Closure
 import net.auoeke.fabricmodgradle.*
 import net.auoeke.fabricmodgradle.extension.contact.Contact
@@ -11,21 +12,14 @@ import net.auoeke.fabricmodgradle.extension.entrypoint.EntrypointContainer
 import net.auoeke.fabricmodgradle.extension.entrypoint.EntrypointTarget
 import net.auoeke.fabricmodgradle.extension.json.Container
 import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
-import net.auoeke.fabricmodgradle.extension.json.JsonSerializableAdapter
 import net.auoeke.fabricmodgradle.extension.misc.*
 import net.auoeke.fabricmodgradle.extension.mixin.MixinContainer
 import net.auoeke.fabricmodgradle.extension.relation.RelationContainer
-import org.gradle.api.DefaultTask
 import org.gradle.api.Project
-import org.gradle.api.Task
-import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceSet
-import org.gradle.api.tasks.TaskAction
 import org.gradle.util.Configurable
 import org.gradle.util.internal.ConfigureUtil
 import java.io.File
-import java.io.StringWriter
-
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.nio.file.FileSystems
@@ -48,8 +42,8 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
 
     var description: String? = null
     private val contact: Contact = Contact()
-    private val authors: PersonContainer = PersonContainer(this.project)
-    private val contributors: PersonContainer = PersonContainer(this.project)
+    private val authors: PersonContainer = PersonContainer(this)
+    private val contributors: PersonContainer = PersonContainer(this)
     private val license: LicenseContainer = LicenseContainer()
     private val icon: IconContainer = IconContainer()
     private var environment: String? = null
@@ -62,7 +56,7 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
         }
     private val entrypoints: EntrypointContainer = EntrypointContainer(this)
     private val languageAdapters: LanguageAdapterContainer = LanguageAdapterContainer()
-    private var custom: CustomObject = CustomObject(this.project)
+    private var custom: CustomObject = CustomObject(this)
     private val mixins: MixinContainer = MixinContainer()
     private val depends: RelationContainer = RelationContainer()
     private val recommends: RelationContainer = RelationContainer()
@@ -273,7 +267,13 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
         return ConfigureUtil.configureSelf(configurator, this) ?: this
     }
 
-    private fun configure(obj: Any, configuration: Closure<*>?): Any? = FabricModGradle.configure(this.project, obj, configuration)
+    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+    fun configure(obj: Any?, configurator: Closure<*>?): Any? {
+        var result: Any? = null
+        this.project.configure(obj, configurator?.andThen(closure {it: Any? -> result = it}))
+
+        return result
+    }
 
     private fun info(types: MutableMap<String, ClassInfo>, type: String): ClassInfo = types[type] ?: this.classPathTypes.computeIfAbsent(type) {
         val iterator = this.classPath.listIterator() as MutableListIterator

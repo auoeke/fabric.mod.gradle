@@ -7,8 +7,6 @@ import com.google.gson.JsonPrimitive
 import net.auoeke.fabricmodgradle.empty
 import net.auoeke.fabricmodgradle.extension.json.Container
 import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
-import java.util.ArrayList
-import java.util.function.Consumer
 
 class JarContainer : JsonSerializable, Container {
     val jars: MutableList<String> = ArrayList()

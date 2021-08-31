@@ -4,13 +4,7 @@ package net.auoeke.fabricmodgradle
 
 import com.google.gson.JsonPrimitive
 import groovy.lang.Closure
-import org.gradle.api.Action
-import org.gradle.api.Project
-import org.gradle.api.Task
-import java.io.File
-import java.nio.file.Files
 import java.util.*
-import kotlin.reflect.KClass
 
 inline val Any?.string: String get() = Objects.toString(this)
 inline val Collection<*>.empty: Boolean get() = this.isEmpty()
@@ -60,8 +54,8 @@ inline fun String.endsWithAny(vararg suffixes: String): Boolean {
     return false
 }
 
-inline val Any?.iterable get() = when (this) {
-    is Iterable<*> -> this
+inline val <T> T.iterable: Iterable<T> get() = when (this) {
+    is Iterable<*> -> this as Iterable<T>
     else -> listOf(this)
 }
 

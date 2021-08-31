@@ -5,9 +5,8 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import net.auoeke.fabricmodgradle.extension.json.Container
 import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
-import java.util.ArrayList
 
-internal class LicenseContainer : JsonSerializable, Container {
+class LicenseContainer : JsonSerializable, Container {
     val licenses: MutableList<String> = ArrayList()
     override val empty: Boolean get() = this.licenses.isEmpty()
 

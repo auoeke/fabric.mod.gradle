@@ -1,10 +1,8 @@
 package net.auoeke.fabricmodgradle.extension.entrypoint
 
-import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
 import net.auoeke.fabricmodgradle.json
 import net.auoeke.fabricmodgradle.string
 

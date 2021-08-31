@@ -5,12 +5,12 @@ import com.google.gson.JsonSerializationContext
 import groovy.lang.Closure
 import groovy.lang.GroovyObjectSupport
 import net.auoeke.fabricmodgradle.empty
+import net.auoeke.fabricmodgradle.extension.Metadata
 import net.auoeke.fabricmodgradle.extension.json.Container
 import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
-import org.gradle.api.Project
 
 @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-class CustomObject(private val project: Project) : GroovyObjectSupport(), JsonSerializable, Container {
+class CustomObject(private val metadata: Metadata) : GroovyObjectSupport(), JsonSerializable, Container {
     private var values: MutableMap<String, Any?> = LinkedHashMap()
     override val empty get() = this.values.empty
 
@@ -26,7 +26,7 @@ class CustomObject(private val project: Project) : GroovyObjectSupport(), JsonSe
             args.size == 1 -> {
                 val arg = args[0]
                 this.values[name] = when (arg) {
-                    is Closure<*> -> CustomObject(this.project).also {it.configure(arg)}
+                    is Closure<*> -> CustomObject(this.metadata).also {it.configure(arg)}
                     else -> arg
                 }
             }
@@ -36,7 +36,7 @@ class CustomObject(private val project: Project) : GroovyObjectSupport(), JsonSe
     }
 
     fun configure(configurator: Closure<*>?) {
-        this.project.configure(this, configurator)
+        this.metadata.configure(this, configurator)
     }
 
     fun configure(values: MutableMap<String, Any?>) {

@@ -3,9 +3,7 @@ package net.auoeke.fabricmodgradle.extension
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.Opcodes
-import java.io.File
 import java.io.InputStream
-import java.util.*
 
 class ClassInfo(input: InputStream) : ClassVisitor(Opcodes.ASM9) {
     lateinit var name: String private set

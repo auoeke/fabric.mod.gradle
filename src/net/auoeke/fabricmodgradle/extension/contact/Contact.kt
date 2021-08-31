@@ -1,9 +1,6 @@
 package net.auoeke.fabricmodgradle.extension.contact
 
-import net.auoeke.fabricmodgradle.extension.Metadata
 import net.auoeke.fabricmodgradle.extension.json.Container
-import org.gradle.api.Project
-import org.gradle.api.tasks.SourceSet
 import java.util.*
 
 class Contact : Container {
