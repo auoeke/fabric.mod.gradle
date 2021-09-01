@@ -15,14 +15,14 @@ import java.io.File
 import java.io.StringWriter
 import javax.inject.Inject
 
-@Suppress("LeakingThis", "unused")
+@Suppress("LeakingThis")
 open class GenerateMetadata @Inject constructor(private val set: SourceSet) : DefaultTask() {
     private val output: File = this.project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json")
 
     @OutputDirectory
     val outputDirectory: File = this.output.parentFile
 
-    private val metadata: Metadata = Metadata(this.project, this.set).also {
+    private val metadata: Metadata = Metadata(this.project, this.set, this.outputDirectory).also {
         this.project.extensions.add(this.set.getTaskName(null, "mod"), it)
     }
 
@@ -30,13 +30,15 @@ open class GenerateMetadata @Inject constructor(private val set: SourceSet) : De
         this.group = "fabric"
         this.outputs.upToDateWhen {false}
 
-        (this.project.tasks.getByName(this.set.processResourcesTaskName) as AbstractCopyTask).from(this)
+        (this.project.tasks.getByName(this.set.processResourcesTaskName) as AbstractCopyTask).also {
+            it.dependsOn(this)
+            this.finalizedBy(it)
+        }
     }
 
     @TaskAction
     fun generate() {
         if (this.metadata.initialized == true) {
-            // this.set.output.dir(this.outputDirectory.apply {mkdirs()})
             val stringWriter = StringWriter()
             gson.toJson(this.metadata, Metadata::class.java, JsonWriter(stringWriter).apply {setIndent("    ")})
             this.output.writeText(stringWriter.toString())
