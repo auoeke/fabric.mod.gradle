@@ -7,22 +7,22 @@ import net.auoeke.fabricmodgradle.extension.Metadata
 import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
 import net.auoeke.fabricmodgradle.extension.json.JsonSerializableAdapter
 import org.gradle.api.DefaultTask
+import org.gradle.api.tasks.AbstractCopyTask
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.SourceSet
 import org.gradle.api.tasks.TaskAction
-import org.gradle.jvm.tasks.Jar
 import java.io.File
 import java.io.StringWriter
 import javax.inject.Inject
 
-@Suppress("LeakingThis")
+@Suppress("LeakingThis", "unused")
 open class GenerateMetadata @Inject constructor(private val set: SourceSet) : DefaultTask() {
     private val output: File = this.project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json")
 
     @OutputDirectory
     val outputDirectory: File = this.output.parentFile
 
-    private val metadata: Metadata = Metadata(this.project, this.set, this.outputDirectory).also {
+    private val metadata: Metadata = Metadata(this.project, this.set).also {
         this.project.extensions.add(this.set.getTaskName(null, "mod"), it)
     }
 
@@ -30,17 +30,13 @@ open class GenerateMetadata @Inject constructor(private val set: SourceSet) : De
         this.group = "fabric"
         this.outputs.upToDateWhen {false}
 
-        this.project.tasks.getByName(this.set.classesTaskName).also {
-            this.dependsOn(it)
-            it.finalizedBy(this)
-        }
-        (this.project.tasks.findByName(this.set.jarTaskName) as Jar?)?.dependsOn(this)
+        (this.project.tasks.getByName(this.set.processResourcesTaskName) as AbstractCopyTask).from(this)
     }
 
     @TaskAction
     fun generate() {
         if (this.metadata.initialized == true) {
-            this.set.output.dir(this.outputDirectory.apply {mkdirs()})
+            // this.set.output.dir(this.outputDirectory.apply {mkdirs()})
             val stringWriter = StringWriter()
             gson.toJson(this.metadata, Metadata::class.java, JsonWriter(stringWriter).apply {setIndent("    ")})
             this.output.writeText(stringWriter.toString())
