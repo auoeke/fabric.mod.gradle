@@ -13,8 +13,8 @@ class FabricModGradleTest {
     }
 
     @Test
-    fun jar() {
-        this.run("jar")
+    fun build() {
+        this.run("build")
     }
 
    // @Test
