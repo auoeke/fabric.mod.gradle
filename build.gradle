@@ -57,7 +57,7 @@ test {
 publishing {
     repositories {
         maven {
-            url = "https://auoeke.jfrog.io/artifactory/maven"
+            url = "https://maven.auoeke.net"
 
             credentials {
                 username = System.properties["maven.username"]
