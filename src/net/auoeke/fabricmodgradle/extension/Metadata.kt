@@ -4,6 +4,8 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonSerializationContext
 import groovy.lang.Closure
+import net.auoeke.extensions.asMutable
+import net.auoeke.extensions.endsWith
 import net.auoeke.fabricmodgradle.*
 import net.auoeke.fabricmodgradle.extension.contact.Contact
 import net.auoeke.fabricmodgradle.extension.contact.Person
@@ -79,7 +81,7 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
     }
 
     @Transient
-    private val classPathTypes: MutableMap<String, ClassInfo> = HashMap()
+    private val classPathTypes: MutableMap<String, ClassInfo?> = HashMap()
 
     fun entrypoints(configuration: Closure<*>) {
         this.configure(this.entrypoints, configuration)
@@ -270,20 +272,20 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
     @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     fun configure(obj: Any?, configurator: Closure<*>?): Any? {
         var result: Any? = null
-        this.project.configure(obj, configurator?.andThen(closure {it: Any? -> result = it}))
+        this.project.configure(obj, configurator?.andThen(closure {result = it}))
 
         return result
     }
 
-    private fun info(types: MutableMap<String, ClassInfo>, type: String): ClassInfo = types[type] ?: this.classPathTypes.computeIfAbsent(type) {
-        val iterator = this.classPath.listIterator() as MutableListIterator
+    private fun info(types: MutableMap<String, ClassInfo>, type: String): ClassInfo? = types[type] ?: this.classPathTypes.computeIfAbsent(type) {
+        val iterator = this.classPath.listIterator().asMutable()
 
         iterator.forEach {
             if (it.exists()) {
                 val filename = it.fileName
 
                 when {
-                    filename !== null && filename.toString().endsWithAny(".jar", ".zip") -> FileSystems.newFileSystem(it).getPath("").also {root -> iterator.set(root)}
+                    filename !== null && filename.toString().endsWith(".jar", ".zip") -> FileSystems.newFileSystem(it).getPath("").also {root -> iterator.set(root)}
                     else -> it
                 }.resolve("$type.class").also {file ->
                     if (file.exists()) {
@@ -295,21 +297,22 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
             }
         }
 
-        throw ClassNotFoundException(type)
+        return@computeIfAbsent null
     }
 
     private fun processInterfaces(types: MutableMap<String, ClassInfo>, type: String?): Set<String> {
-        if (type === null) {
-            return setOf()
+        if (type !== null) {
+            this.info(types, type)?.also {
+                val interfaces = it.interfaces.clone() as HashSet<String>
+                interfaces += this.processInterfaces(types, it.superclass)
+                interfaces.forEach {iface -> interfaces += this.processInterfaces(types, iface)}
+                it.interfaces = interfaces
+
+                return interfaces
+            }
         }
 
-        val info = this.info(types, type)
-        val interfaces = info.interfaces.clone() as HashSet<String>
-        interfaces += this.processInterfaces(types, info.superclass)
-        interfaces.forEach {interfaces += this.processInterfaces(types, it)}
-        info.interfaces = interfaces
-
-        return interfaces
+        return emptySet()
     }
 
     private companion object {

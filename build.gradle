@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "net.auoeke"
-version = "0.1.16"
+version = "0.1.17"
 
 sourceSets {
     main {
@@ -37,9 +37,12 @@ gradlePlugin {
 
 repositories {
     mavenCentral()
+
+    maven {url = "https://maven.auoeke.net"}
 }
 
 dependencies {
+    api("net.auoeke:extensions:latest.integration")
     api("com.google.code.gson:gson:latest.integration")
     api("org.ow2.asm:asm:latest.integration")
     api("org.ow2.asm:asm-tree:latest.integration")

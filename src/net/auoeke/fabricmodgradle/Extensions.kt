@@ -21,37 +21,15 @@ inline fun <reified T> catch(action: () -> Unit) {
     }
 }
 
-inline fun <T : (P) -> V, P, V> closure(lambda: T): Closure<V> = object : Closure<V>(lambda) {
-    override fun call(arg: Any?): V {
-        return (this.owner as T)(arg as P)
-    }
+inline fun closure(noinline lambda: (Any?) -> Unit): Closure<*> = object : Closure<Any?>(lambda) {
+    override fun call(arg: Any?): Any = (this.owner as (Any?) -> Any?)
 
     @Suppress("unused")
-    fun doCall(arg: Any?): V {
-        return this.doCall(arg)
-    }
-}
-
-inline fun <reified T> Any?.cast(): T {
-    if (!T::class.isInstance(this)) {
-        throw IllegalArgumentException("${if (this === null) "null" else "$this of ${this.javaClass}"} was passed where a ${T::class.qualifiedName} instance was expected.")
-    }
-
-    return this as T
+    fun doCall(arg: Any?): Any = this.doCall(arg)
 }
 
 inline fun <K, V> Map<K, V>.eachValue(action: (V) -> Unit) {
     this.forEach {action(it.value)}
-}
-
-inline fun String.endsWithAny(vararg suffixes: String): Boolean {
-    suffixes.forEach {
-        if (this.endsWith(it, false)) {
-            return true
-        }
-    }
-
-    return false
 }
 
 inline val <T> T.iterable: Iterable<T> get() = when (this) {
