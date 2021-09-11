@@ -32,7 +32,7 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
     @Transient
     var initialized: Boolean? = null
 
-    var schemaVersion: Int = 0
+    var schemaVersion: Int = 1
     lateinit var id: String
     var version: String? = null
         set(version) {
