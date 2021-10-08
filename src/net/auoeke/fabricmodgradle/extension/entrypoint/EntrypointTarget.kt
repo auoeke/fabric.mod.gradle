@@ -12,13 +12,13 @@ class EntrypointTarget() {
     lateinit var value: List<String>
 
     fun toJson(): List<JsonElement> = when {
-        this.adapter === null -> when (this.value.size) {
-            1 -> listOf(this.value.first().json)
-            else -> this.value.map(::JsonPrimitive)
+        adapter === null -> when (value.size) {
+            1 -> listOf(value.first().json)
+            else -> value.map(::JsonPrimitive)
         }
-        else -> this.value.map {target ->
+        else -> value.map {target ->
             JsonObject().also {
-                it.add("adapter", this.adapter.json)
+                it.add("adapter", adapter.json)
                 it.add("value", target.json)
             }
         }

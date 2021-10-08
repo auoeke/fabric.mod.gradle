@@ -16,13 +16,13 @@ import java.lang.reflect.Method
 @Suppress("UNCHECKED_CAST")
 class EntrypointContainer(private val metadata: Metadata) : GroovyObjectSupport(), JsonSerializable, Container {
     var entrypoints: MutableMap<String, MutableList<EntrypointTarget>>? = null
-    override val empty: Boolean get() = this.entrypoints.emptyOrNull
+    override val empty: Boolean get() = entrypoints.emptyOrNull
 
     fun add(entrypoint: String, target: EntrypointTarget) {
-        (this.entrypoints ?: LinkedHashMap<String, MutableList<EntrypointTarget>>().also {this.entrypoints = it}).computeIfAbsent(entrypoint) {ArrayList()} += target
+        (entrypoints ?: LinkedHashMap<String, MutableList<EntrypointTarget>>().also {entrypoints = it}).computeIfAbsent(entrypoint) {ArrayList()} += target
     }
 
-    fun add(entrypoint: String, configuration: Closure<*>) = this.add(entrypoint, EntrypointTarget().also {this.metadata.project.configure(it, configuration)})
+    fun add(entrypoint: String, configuration: Closure<*>) = this.add(entrypoint, EntrypointTarget().also {metadata.project.configure(it, configuration)})
     fun add(entrypoint: String, adapter: String?, vararg targets: String) = this.add(entrypoint, EntrypointTarget(targets.toList(), adapter))
     fun add(entrypoint: String, type: String) = this.add(entrypoint, null, type)
 
@@ -49,7 +49,7 @@ class EntrypointContainer(private val metadata: Metadata) : GroovyObjectSupport(
     }
 
     override fun toJson(): JsonElement = JsonObject().also {json ->
-        this.entrypoints!!.forEach {(entrypoint, targets) ->
+        entrypoints!!.forEach {(entrypoint, targets) ->
             json.add(entrypoint, JsonArray().also {array ->
                 targets.forEach {target ->
                     target.toJson().forEach(array::add)

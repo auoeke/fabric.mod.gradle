@@ -10,11 +10,11 @@ import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
 
 class JarContainer : JsonSerializable, Container {
     val jars: MutableList<String> = ArrayList()
-    override val empty: Boolean get() = this.jars.empty
+    override val empty: Boolean get() = jars.empty
 
     override fun toJson(): JsonElement {
-        return JsonArray(this.jars.size).also {json ->
-            this.jars.forEach {
+        return JsonArray(jars.size).also {json ->
+            jars.forEach {
                 val file = JsonObject()
                 file.add("file", JsonPrimitive(it))
                 json.add(file)

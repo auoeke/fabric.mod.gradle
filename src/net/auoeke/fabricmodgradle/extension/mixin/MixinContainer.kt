@@ -9,19 +9,19 @@ import java.util.ArrayList
 
 class MixinContainer : JsonSerializable, Container {
     private val entries: MutableList<MixinEntry> = ArrayList()
-    override val empty: Boolean get() = this.entries.empty
+    override val empty: Boolean get() = entries.empty
 
     fun add(environment: String? = null, path: String) {
-         this.entries += MixinEntry(path, environment)
+         entries += MixinEntry(path, environment)
     }
 
     fun client(configuration: String) {
-        this.add("client", configuration)
+        add("client", configuration)
     }
 
     fun server(configuration: String) {
-        this.add("server", configuration)
+        add("server", configuration)
     }
 
-    override fun toJson(context: JsonSerializationContext): JsonElement = context.serialize(this.entries)
+    override fun toJson(context: JsonSerializationContext): JsonElement = context.serialize(entries)
 }

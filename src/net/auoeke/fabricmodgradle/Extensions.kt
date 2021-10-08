@@ -22,10 +22,10 @@ inline fun <reified T> catch(action: () -> Unit) {
 }
 
 inline fun closure(noinline lambda: (Any?) -> Unit): Closure<*> = object : Closure<Any?>(lambda) {
-    override fun call(arg: Any?): Any = (this.owner as (Any?) -> Any?)
+    override fun call(arg: Any?): Any = (owner as (Any?) -> Any?)
 
     @Suppress("unused")
-    fun doCall(arg: Any?): Any = this.doCall(arg)
+    fun doCall(arg: Any?): Any = doCall(arg)
 }
 
 inline fun <K, V> Map<K, V>.eachValue(action: (V) -> Unit) {

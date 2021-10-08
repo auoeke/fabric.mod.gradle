@@ -10,21 +10,21 @@ import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
 
 class PersonContainer(private val metadata: Metadata) : GroovyObjectSupport(), JsonSerializable, Container {
     val people: MutableSet<Person> = HashSet()
-    override val empty: Boolean get() = this.people.isEmpty()
+    override val empty: Boolean get() = people.isEmpty()
 
     fun add(name: String, configuration: Closure<*>? = null): Person {
         val person = Person(name, if (configuration == null) null else Contact())
-        this.metadata.configure(person.contact, configuration)
-        this.people.add(person)
+        metadata.configure(person.contact, configuration)
+        people.add(person)
 
         return person
     }
 
     override fun invokeMethod(name: String, args: Any): Any {
-        return this.add(name, (args as Array<*>)[0] as Closure<*>)
+        return add(name, (args as Array<*>)[0] as Closure<*>)
     }
 
     override fun toJson(context: JsonSerializationContext): JsonElement {
-        return context.serialize(this.people)
+        return context.serialize(people)
     }
 }

@@ -67,10 +67,10 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
     private val conflicts: RelationContainer = RelationContainer()
     private val jars: JarContainer = JarContainer()
 
-    private val classPath: List<Path> by lazy {this.set.runtimeClasspath.map {it.toPath()}}
+    private val classPath: List<Path> by lazy {set.runtimeClasspath.map {it.toPath()}}
     private val types: MutableMap<String, ClassInfo> by lazy {
         HashMap<String, ClassInfo>().also {types ->
-            this.set.output.classesDirs.forEach {directory ->
+            set.output.classesDirs.forEach {directory ->
                 directory.walkTopDown().filter {it.isFile && it.extension == "class"}.associateTo(types) {file -> ClassInfo(file.inputStream()).let {it.name to it}}
             }
 
@@ -84,7 +84,7 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
     private val classPathTypes: MutableMap<String, ClassInfo?> = HashMap()
 
     fun entrypoints(configuration: Closure<*>) {
-        this.configure(this.entrypoints, configuration)
+        this.configure(entrypoints, configuration)
     }
 
     fun entrypoints(entrypoints: Map<*, *>) {
@@ -108,23 +108,23 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
     }
 
     fun jars(vararg paths: String) {
-        this.jars.jars += paths
+        jars.jars += paths
     }
 
     fun jar(path: String) {
-        this.jars.jars += path
+        jars.jars += path
     }
 
     fun languageAdapters(configuration: Closure<*>) {
-        this.configure(this.languageAdapters, configuration)
+        this.configure(languageAdapters, configuration)
     }
 
     fun languageAdapter(key: String, type: String) {
-        this.languageAdapters.setProperty(key, type)
+        languageAdapters.setProperty(key, type)
     }
 
     fun mixin(configuration: Closure<*>) {
-        this.configure(this.mixins, configuration)
+        this.configure(mixins, configuration)
     }
 
     fun mixin(configuration: String) {
@@ -136,43 +136,43 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
     }
 
     fun mixin(environment: String? = null, configuration: String) {
-        this.mixins.add(environment, configuration)
+        mixins.add(environment, configuration)
     }
 
     fun depends(dependencies: Map<String, *>) {
-        this.depends.add(dependencies)
+        depends.add(dependencies)
     }
 
     fun recommends(dependencies: Map<String, *>) {
-        this.recommends.add(dependencies)
+        recommends.add(dependencies)
     }
 
     fun suggests(dependencies: Map<String, *>) {
-        this.suggests.add(dependencies)
+        suggests.add(dependencies)
     }
 
     fun breaks(dependencies: Map<String, *>) {
-        this.breaks.add(dependencies)
+        breaks.add(dependencies)
     }
 
     fun conflicts(dependencies: Map<String, *>) {
-        this.conflicts.add(dependencies)
+        conflicts.add(dependencies)
     }
 
     fun contact(configuration: Closure<*>) {
-        this.configure(this.contact, configuration)
+        this.configure(contact, configuration)
     }
 
     fun authors(configuration: Closure<*>) {
-        this.configure(this.authors, configuration)
+        this.configure(authors, configuration)
     }
 
     fun author(author: String, configuration: Closure<*>) {
-        this.authors.add(author, configuration)
+        authors.add(author, configuration)
     }
 
     fun author(author: String) {
-        this.authors.people.add(Person(author))
+        authors.people.add(Person(author))
     }
 
     fun authors(vararg authors: String) {
@@ -180,15 +180,15 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
     }
 
     fun contributors(configuration: Closure<*>) {
-        this.configure(this.contributors, configuration)
+        this.configure(contributors, configuration)
     }
 
     fun contributor(author: String, configuration: Closure<*>) {
-        this.contributors.add(author, configuration)
+        contributors.add(author, configuration)
     }
 
     fun contributor(contributor: String) {
-        this.contributors.people.add(Person(contributor))
+        contributors.people.add(Person(contributor))
     }
 
     fun contributors(vararg contributors: String) {
@@ -200,43 +200,43 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
     }
 
     fun license(vararg licenses: String) {
-        this.license.licenses += licenses
+        license.licenses += licenses
     }
 
     fun icon(icons: MutableMap<Int?, String>) {
         require(!icons.containsValue(null as String?)) {"null values are not allowed."}
         require(icons.size <= 1 || null in icons) {"An icon for all sizes was already specified."}
 
-        this.icon.icons = icons
+        icon.icons = icons
     }
 
     fun icon(path: String) {
-        if (!this.icon.icons.empty) {
+        if (!icon.icons.empty) {
             throw IllegalStateException("An icon for a specific size was already specified.")
         }
 
-        this.icon.icons[null] = path
+        icon.icons[null] = path
     }
 
     fun custom(configurator: Closure<*>) {
-        this.custom.configure(configurator)
+        custom.configure(configurator)
     }
 
     fun custom(values: MutableMap<String, Any?>) {
-        this.custom.configure(values)
+        custom.configure(values)
     }
 
     override fun toJson(context: JsonSerializationContext): JsonElement {
         val json = JsonObject()
 
-        if (this.entrypoints.empty) {
-            this.types.eachValue {type ->
+        if (entrypoints.empty) {
+            types.eachValue {type ->
                 type.interfaces.forEach {
                     when (it) {
-                        "net/fabricmc/api/ModInitializer" -> this.entrypoints.add("main", type.binaryName)
-                        "net/fabricmc/api/ClientModInitializer" -> this.entrypoints.add("client", type.binaryName)
-                        "net/fabricmc/api/DedicatedServerModInitializer" -> this.entrypoints.add("server", type.binaryName)
-                        "net/fabricmc/loader/api/entrypoint/PreLaunchEntrypoint" -> this.entrypoints.add("preLaunch", type.binaryName)
+                        "net/fabricmc/api/ModInitializer" -> entrypoints.add("main", type.binaryName)
+                        "net/fabricmc/api/ClientModInitializer" -> entrypoints.add("client", type.binaryName)
+                        "net/fabricmc/api/DedicatedServerModInitializer" -> entrypoints.add("server", type.binaryName)
+                        "net/fabricmc/loader/api/entrypoint/PreLaunchEntrypoint" -> entrypoints.add("preLaunch", type.binaryName)
                     }
                 }
             }
@@ -255,15 +255,15 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
     }
 
     override fun configure(configurator: Closure<*>?): Any {
-        if (this.initialized != true) {
-            this.initialized = true
+        if (initialized != true) {
+            initialized = true
 
-            this.schemaVersion = 1
-            this.id = this.project.name
-            this.version = this.project.version.string
-            this.description = this.project.description
+            schemaVersion = 1
+            id = project.name
+            version = project.version.string
+            description = project.description
 
-            this.set.resources.srcDir(this.outputDirectory)
+            set.resources.srcDir(outputDirectory)
         }
 
         return ConfigureUtil.configureSelf(configurator, this) ?: this
@@ -272,13 +272,13 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
     @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
     fun configure(obj: Any?, configurator: Closure<*>?): Any? {
         var result: Any? = null
-        this.project.configure(obj, configurator?.andThen(closure {result = it}))
+        project.configure(obj, configurator?.andThen(closure {result = it}))
 
         return result
     }
 
-    private fun info(types: MutableMap<String, ClassInfo>, type: String): ClassInfo? = types[type] ?: this.classPathTypes.computeIfAbsent(type) {
-        val iterator = this.classPath.listIterator().asMutable()
+    private fun info(types: MutableMap<String, ClassInfo>, type: String): ClassInfo? = types[type] ?: classPathTypes.computeIfAbsent(type) {
+        val iterator = classPath.listIterator().asMutable()
 
         iterator.forEach {
             if (it.exists()) {
@@ -302,10 +302,10 @@ class Metadata(@Transient val project: Project, @Transient val set: SourceSet, @
 
     private fun processInterfaces(types: MutableMap<String, ClassInfo>, type: String?): Set<String> {
         if (type !== null) {
-            this.info(types, type)?.also {
+            info(types, type)?.also {
                 val interfaces = it.interfaces.clone() as HashSet<String>
-                interfaces += this.processInterfaces(types, it.superclass)
-                interfaces.forEach {iface -> interfaces += this.processInterfaces(types, iface)}
+                interfaces += processInterfaces(types, it.superclass)
+                interfaces.forEach {iface -> interfaces += processInterfaces(types, iface)}
                 it.interfaces = interfaces
 
                 return interfaces

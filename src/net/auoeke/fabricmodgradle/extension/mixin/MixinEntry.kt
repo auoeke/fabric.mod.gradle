@@ -7,11 +7,11 @@ import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
 
 class MixinEntry(private val path: String? = null, private val environment: String? = null) : JsonSerializable {
     override fun toJson(): JsonElement {
-        return this.environment?.let {
+        return environment?.let {
             JsonObject().also {
-                it.add("config", JsonPrimitive(this.path))
-                it.add("environment", JsonPrimitive(this.environment))
+                it.add("config", JsonPrimitive(path))
+                it.add("environment", JsonPrimitive(environment))
             }
-        } ?: JsonPrimitive(this.path)
+        } ?: JsonPrimitive(path)
     }
 }

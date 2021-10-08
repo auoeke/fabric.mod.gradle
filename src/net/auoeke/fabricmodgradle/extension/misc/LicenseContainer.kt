@@ -8,9 +8,9 @@ import net.auoeke.fabricmodgradle.extension.json.JsonSerializable
 
 class LicenseContainer : JsonSerializable, Container {
     val licenses: MutableList<String> = ArrayList()
-    override val empty: Boolean get() = this.licenses.isEmpty()
+    override val empty: Boolean get() = licenses.isEmpty()
 
     override fun toJson(context: JsonSerializationContext): JsonElement {
-        return if (this.licenses.size == 1) JsonPrimitive(this.licenses[0]) else context.serialize(this.licenses)
+        return if (licenses.size == 1) JsonPrimitive(licenses[0]) else context.serialize(licenses)
     }
 }

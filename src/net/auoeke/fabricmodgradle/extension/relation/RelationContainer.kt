@@ -10,7 +10,7 @@ import net.auoeke.fabricmodgradle.string
 @Suppress("UNCHECKED_CAST")
 class RelationContainer : JsonSerializable, Container {
     private val relations: MutableMap<String, Versions> = LinkedHashMap()
-    override val empty: Boolean get() = this.relations.empty
+    override val empty: Boolean get() = relations.empty
 
     fun add(entries: Map<String, *>) {
         val versions = Versions()
@@ -21,11 +21,11 @@ class RelationContainer : JsonSerializable, Container {
                 is Collection<*> -> value.toMutableList() as MutableList<String>
                 else -> mutableListOf(value.string)
             }
-            this.relations[key] = versions
+            relations[key] = versions
         }
     }
 
     override fun toJson(context: JsonSerializationContext): JsonElement {
-        return context.serialize(this.relations)
+        return context.serialize(relations)
     }
 }

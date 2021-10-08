@@ -8,13 +8,13 @@ import net.auoeke.fabricmodgradle.json
 
 class Person(val name: String, val contact: Contact? = null) : JsonSerializable {
     override fun toJson(context: JsonSerializationContext): JsonElement {
-        if (this.contact == null || this.contact.empty) {
-            return this.name.json
+        if (contact == null || contact.empty) {
+            return name.json
         }
 
         return JsonObject().also {
-            it.add("name", this.name.json)
-            it.add("contact", context.serialize(this.contact))
+            it.add("name", name.json)
+            it.add("contact", context.serialize(contact))
         }
     }
 }

@@ -8,9 +8,9 @@ import java.io.InputStream
 class ClassInfo(input: InputStream) : ClassVisitor(Opcodes.ASM9) {
     lateinit var name: String private set
     var superclass: String? = null
-        private set
+       private set
     var interfaces: HashSet<String> = HashSet()
-    val binaryName: String by lazy {this.name.replace('/', '.')}
+    val binaryName: String by lazy {name.replace('/', '.')}
 
     init {
         ClassReader(input).accept(this, ClassReader.SKIP_CODE)
@@ -18,7 +18,7 @@ class ClassInfo(input: InputStream) : ClassVisitor(Opcodes.ASM9) {
 
     override fun visit(version: Int, access: Int, name: String, signature: String?, superName: String, interfaces: Array<String>?) {
         if (superName != "java/lang/Object") {
-            this.superclass = superName
+            superclass = superName
         }
 
         this.name = name

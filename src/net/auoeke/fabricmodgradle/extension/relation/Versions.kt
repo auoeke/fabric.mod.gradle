@@ -10,6 +10,6 @@ class Versions : JsonSerializable {
     var versions: MutableList<String> = ArrayList()
 
     override fun toJson(context: JsonSerializationContext): JsonElement {
-        return if (this.versions.size == 1) JsonPrimitive(this.versions[0]) else context.serialize(this.versions)
+        return if (versions.size == 1) JsonPrimitive(versions[0]) else context.serialize(versions)
     }
 }
