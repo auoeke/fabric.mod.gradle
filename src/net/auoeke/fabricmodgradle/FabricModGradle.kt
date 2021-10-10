@@ -9,25 +9,29 @@ import net.auoeke.fabricmodgradle.extension.json.JsonSerializableAdapter
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.JavaPluginExtension
+import java.io.File
 import java.io.StringWriter
 
 @Suppress("unused")
 class FabricModGradle : Plugin<Project> {
     override fun apply(project: Project) {
         project.extensions.getByType(JavaPluginExtension::class.java).sourceSets.all {set ->
-            val output = project.buildDir.resolve("generated/resources/${set.name}/fabric.mod.json")
-            val outputDirectory = output.parentFile.apply {mkdirs()}
-            val metadata = Metadata(project, set, outputDirectory).also {
-                project.extensions.add(set.getTaskName(null, "mod"), it)
-            }
+            val outputDirectory = project.buildDir.resolve("generated/resources/${set.name}")
+                .also(File::mkdirs)
+                .also(set.resources::srcDir)
+            val metadata = Metadata(project, set, outputDirectory)
+                .also {project.extensions.add(set.getTaskName(null, "mod"), it)}
 
-            project.gradle.projectsEvaluated {
-                if (metadata.initialized == true) {
-                    val stringWriter = StringWriter()
-                    gson.toJson(metadata, Metadata::class.java, JsonWriter(stringWriter).apply {setIndent("    ")})
-                    output.writeText(stringWriter.toString())
-                }
-            }
+            // @formatter:off
+            val write = {_: Any -> if (metadata.initialized == true) {
+                val stringWriter = StringWriter()
+                gson.toJson(metadata, Metadata::class.java, JsonWriter(stringWriter).apply {setIndent("    ")})
+                outputDirectory.resolve("fabric.mod.json").writeText(stringWriter.toString())
+            }}
+            // @formatter:on
+
+            project.gradle.projectsEvaluated(write)
+            project.tasks.getByName("clean").doLast(write)
         }
     }
 

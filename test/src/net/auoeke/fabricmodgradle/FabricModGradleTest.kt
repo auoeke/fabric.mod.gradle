@@ -20,9 +20,9 @@ class FabricModGradleTest {
         run("build")
     }
 
-   // @Test
+   @Test
     fun run() {
-        // this.run("runClient")
+        run("runClient")
     }
 
     private fun runner(vararg args: String) = GradleRunner.create().withProjectDir(File("test/project")).withDebug(true).withPluginClasspath().withArguments(listOf("--stacktrace") + args).forwardOutput()
